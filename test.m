@@ -9,7 +9,6 @@
 
 main()
 
-% Hauptprogramm
 function main
 
 end
