@@ -1,16 +1,23 @@
-%% Visualisierung des Taylor-Green-Wirbels
+options = struct;
+options.nu = 0.01; % Viscosity
+options.t_end = 5; % End time
+options.t_nr = 100; % Number of time steps
+options.x_nr = 100; % Number of x grid points
+options.y_nr = 100; % Number of y grid points
 
-function Taylor_Green_Wirbel(options)
-    % Gitter
-    x     = linspace(0,2*pi,options.x_nr);
-    y     = linspace(0,2*pi,options.y_nr);
-    dx    = x(2)-x(1);
-    dy    = y(2)-y(1);
-    [X,Y] = meshgrid(x,y);
+% Analytische Lösung des Taylor-Green-Wirbels
+Taylor_Green_Wirbel_Sim(options)
+
+function [U, V] = Taylor_Green_Wirbel_Sim(options)
     
-    % Lösung
-    U     = @(t) sin(X).*cos(Y).*exp(-2*options.nu*t);
-    V     = @(t) -cos(X).*sin(Y).*exp(-2*options.nu*t);
+    % Gitter (Grid)
+    x     = linspace(0, 2*pi, options.x_nr);
+    y     = linspace(0, 2*pi, options.y_nr);
+    [X,Y] = meshgrid(x, y);
+    
+    % Lösung (Solution)
+    U     = @(t) sin(X) .* cos(Y) .* exp(-2 * options.nu * t);
+    V     = @(t) -cos(X) .* sin(Y) .* exp(-2 * options.nu * t);
     Psi   = @(t) sin(X).*sin(Y).*exp(-2*options.nu*t);
     
     % Lagrange Partikel
@@ -62,5 +69,5 @@ function Taylor_Green_Wirbel(options)
         Y_pos = Y_pos + t_stp*interp2(X,Y,V_now,X_pos,Y_pos);
     
     end
-    end
+end
     
