@@ -1,4 +1,4 @@
-function options = configureSimulation()
+function options = tgv_01_configureSimulation()
     options = struct( ...
         'nu', 0.01, ...                % Kinematische Viskosität
         't_end', 5, ...                % Endzeit der Simulation

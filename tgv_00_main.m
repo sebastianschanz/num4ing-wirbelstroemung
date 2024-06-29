@@ -1,5 +1,5 @@
 %%% Projekt Wirbelströmung %%%
-%%% TAYLOR-GREEN-WIRBEL %%%
+%%% TAYLOR-GREEN-VORTEX %%%
 
 %%% Gruppe nm Y
 %%% Fabian Schmitt 492849, 
@@ -9,10 +9,10 @@
 
 function main()
     % Hauptfunktion zur Initialisierung und Ausführung der Taylor-Green-Wirbel-Simulation
-    options = configureSimulation();  % Simulationsparameter setzen
-    [X, Y, Psi, Omega] = initSimulation(options);  % Simulationsvariablen initialisieren
-    [ax1, ax2] = initPlots(X, Y, Psi, options);  % Plots initialisieren
-    performSimLoop(X, Y, Omega, options, ax1, ax2);  % Aktualisierungsschleife ausführen
+    options = tgv_01_configureSimulation();  % Simulationsparameter setzen
+    [X, Y, Psi, Omega] = tgv_02_initSimulation(options);  % Simulationsvariablen initialisieren
+    [ax1, ax2] = tgv_03_initPlots(X, Y, Psi, options);  % Plots initialisieren
+    tgv_04_performSimLoop(X, Y, Omega, options, ax1, ax2);  % Aktualisierungsschleife ausführen
 end
 
 main();

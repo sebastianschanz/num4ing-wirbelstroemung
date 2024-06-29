@@ -1,4 +1,4 @@
-function F = applyBoundaryConditions(F, type)
+function F = tgv_applyBoundaryConditions(F, type)
     if nargin < 2
         type = 'Dirichlet';
     end

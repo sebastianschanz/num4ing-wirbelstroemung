@@ -1,4 +1,4 @@
-function Omega = updateVorticity(U, V, Omega, options, dt)
+function Omega = tgv_updateVorticity(U, V, Omega, options, dt)
     % Berechnung der neuen Wirbelstärke mithilfe der Wirbeltransportgleichung
     % unter Berücksichtigung von Konvektion und Diffusion
     [dOmegadx, dOmegady] = gradient(Omega);  % Gradienten der Wirbelstärke

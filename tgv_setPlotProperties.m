@@ -1,4 +1,4 @@
-function setPlotProperties(ax, titleText, xlabelText, ylabelText, options)
+function tgv_setPlotProperties(ax, titleText, xlabelText, ylabelText, options)
     % Plot-Einstellungen
     title(ax, titleText, 'Interpreter', 'latex', 'FontSize', 12);  % Titel setzen
     xlabel(ax, xlabelText, 'Interpreter', 'latex');  % X-Achsenbeschriftung
