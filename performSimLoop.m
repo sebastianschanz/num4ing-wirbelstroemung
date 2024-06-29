@@ -11,7 +11,7 @@ function performSimLoop(X, Y, Omega, options, ax1, ax2)
         plotLagrangeParticles(ax1, X_pos, Y_pos, colors, options);  
 
         % 2. Berechnung der Stromfunktion aus der Wirbelstärke
-        Psi = poissonSolver(Omega, options);  
+        Psi = poissonSolver(Omega);  
         Psi = applyBoundaryConditions(Psi, 'Dirichlet'); % Randbedingungen für Psi anwenden
 
         % 3. Berechnung der Geschwindigkeitskomponenten aus der Stromfunktion
@@ -24,8 +24,7 @@ function performSimLoop(X, Y, Omega, options, ax1, ax2)
         Omega = updateVorticity(U, V, Omega, options, dt);
         Omega = applyBoundaryConditions(Omega, 'Dirichlet');  % Randbedingungen für Omega anwenden
 
-
-        % 7. Plot der Stromfunktion nach der Aktualisierung
+        % 6. Plot der Stromfunktion nach der Aktualisierung
         plotStreamFunction(ax2, X, Y, Psi, options);  
 
         sgtitle(['$\nu=', num2str(options.nu), ',~t=', num2str(t, '%.2f'), '$'], 'Interpreter', 'latex');  % Gesamttitel setzen
