@@ -6,7 +6,7 @@ function Omega = updateVorticity(U, V, Omega, options, dt)
 
     % Konvektionsterm: Transport der Wirbelstärke durch die Strömung
     convection = U .* dOmegadx + V .* dOmegady;
-    
+
     % Diffusionsterm: Viskose Ausbreitung der Wirbelstärke
     diffusion = options.nu * laplacian_Omega;
 
