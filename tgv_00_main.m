@@ -10,10 +10,8 @@
 function main()
     % Hauptfunktion zur Initialisierung und Ausführung der Taylor-Green-Wirbel-Simulation
     options = tgv_01_configureSimulation();  % Simulationsparameter setzen
-    [X, Y, Psi, Omega] = tgv_02_initSimulation(options);  % Simulationsvariablen initialisieren
-    [ax1, ax2] = tgv_03_initPlots(X, Y, Psi, options);  % Plots initialisieren
-    tgv_04_performSimLoop(X, Y, Omega, options, ax1, ax2);  % Aktualisierungsschleife ausführen
-    tgv_05_perfomAnalyticalSolution(X, Y, options);
+    [X, Y, Omega] = tgv_02_initSimulation(options);  % Simulationsvariablen initialisieren
+    tgv_03_performSimLoop(X, Y, Omega, options);  % Aktualisierungsschleife ausführen
 end
 
 main();
