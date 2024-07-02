@@ -1,6 +1,7 @@
 function options = tgv_01_configureSimulation()
+    % Defintion der Simulationsparameter
     options = struct( ...
-        'nu', 0.01, ...                % Kinematische Viskosität
+        'nu', 1, ...                % Kinematische Viskosität
         't_end', 5, ...                % Endzeit der Simulation
         't_nr', 100, ...               % Anzahl der Zeitschritte
         'x_nr', 100, ...               % Anzahl der Gitterpunkte in x-Richtung
