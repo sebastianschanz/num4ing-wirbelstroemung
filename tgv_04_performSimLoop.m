@@ -12,7 +12,6 @@ function tgv_04_performSimLoop(X, Y, Omega, options, ax1, ax2)
 
         % 2. Berechnung der Stromfunktion aus der Wirbelstärke
         Psi = tgv_poissonSolver(Omega);
-        Psi = tgv_applyBoundaryConditions(Psi, 'Dirichlet'); % Randbedingungen für Psi anwenden
 
         % 3. Berechnung der Geschwindigkeitskomponenten aus der Stromfunktion
         [U, V] = tgv_updateVelocity(Psi);
