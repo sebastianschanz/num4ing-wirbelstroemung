@@ -6,5 +6,4 @@ function [X, Y, Psi_0, Omega_0] = tgv_02_initSimulation(options)
     Omega_0 = 2*sin(X).*sin(Y)*exp(-2*options.nu);
     Omega_0 = tgv_applyBoundaryConditions(Omega_0, 'Dirichlet'); % Randbedingungen für Omega anwenden
     Psi_0 = tgv_poissonSolver(Omega_0);  % Berechnung der Stromfunktion aus der Wirbelstärke
-    Psi_0 = tgv_applyBoundaryConditions(Psi_0, 'Dirichlet'); % Randbedingungen für Psi anwenden
 end
