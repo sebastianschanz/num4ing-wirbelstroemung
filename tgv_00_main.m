@@ -13,6 +13,7 @@ function main()
     [X, Y, Psi, Omega] = tgv_02_initSimulation(options);  % Simulationsvariablen initialisieren
     [ax1, ax2] = tgv_03_initPlots(X, Y, Psi, options);  % Plots initialisieren
     tgv_04_performSimLoop(X, Y, Omega, options, ax1, ax2);  % Aktualisierungsschleife ausführen
+    tgv_05_perfomAnalyticalSolution(X, Y, options);
 end
 
 main();
