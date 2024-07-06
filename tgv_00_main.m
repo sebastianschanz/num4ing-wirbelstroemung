@@ -18,6 +18,6 @@ end
 main();
 
 % Nächste Schritte:
-% Numerische Verfahren: Sobald die pBerechnung des Taylor-Green-Wirbels korrekt ist, können verschiedene numerische Verfahren getestet werden. Dies könnte durch die Implementierung verschiedener Diskretisierungs- und Zeitschrittverfahren erfolgen (z.B. expliziter Euler, Runge-Kutta, Adams-Bashforth).
+% Numerische Verfahren: Sobald die Berechnung des Taylor-Green-Wirbels korrekt ist, können verschiedene numerische Verfahren getestet werden. Dies könnte durch die Implementierung verschiedener Diskretisierungs- und Zeitschrittverfahren erfolgen (z.B. expliziter Euler, Runge-Kutta, Adams-Bashforth).
 % Validierung: Die Ergebnisse sollten mit analytischen Lösungen oder anderen verifizierten numerischen Ergebnissen verglichen werden, um sicherzustellen, dass die Implementierung korrekt ist.
 % Visualisierung: Zusätzliche Visualisierungen können hinzugefügt werden, um die Ergebnisse besser zu interpretieren und zu analysieren.
