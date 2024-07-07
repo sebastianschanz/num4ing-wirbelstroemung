@@ -21,7 +21,7 @@ function tgv_03_performSimLoop(X, Y, Omega, options)
         end
 
         % Berechnung der numerischen Stromfunktion
-        Psi = tgv_poissonSolver(Omega);
+        Psi = tgv_poissonSolver(Omega, options);
 
         % Aktualisierung der Partikelpositionen (numerisch)
         [U, V] = tgv_updateVelocity(Psi, options);
