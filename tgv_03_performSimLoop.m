@@ -24,11 +24,11 @@ function tgv_03_performSimLoop(X, Y, Omega, options)
         Psi = tgv_poissonSolver(Omega);
 
         % Aktualisierung der Partikelpositionen (numerisch)
-        [U, V] = tgv_updateVelocity(Psi);
+        [U, V] = tgv_updateVelocity(Psi, options);
         [X_pos, Y_pos] = tgv_updatePosition(X_pos, Y_pos, U, V, dt, X, Y);
 
         % Aktualisierung der Wirbelstärke (numerisch)
-        Omega = tgv_updateVorticity(U, V, Omega, options, dt);
+        Omega = tgv_updateVorticity(U, V, Omega, options, Psi, dt);
 
         % Berechnung der analytischen Lösung
         [U_a, V_a, Psi_a] = tgv_computeAnalytical(X, Y, t, options.nu);

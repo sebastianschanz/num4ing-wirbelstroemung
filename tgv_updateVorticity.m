@@ -1,4 +1,8 @@
-function Omega = tgv_updateVorticity(U, V, Omega, options, dt)
+function Omega = tgv_updateVorticity(U, V, Omega, options, Psi, dt)
+    % Erzeugung des Boolschen Vektors W
+    W = ones(options.x_nr, options.y_nr); W(2:end-1, 2:end-1) = 0;
+    w = W(:);
+    
     % Berechnung der neuen Wirbelstärke mithilfe der Wirbeltransportgleichung
     % unter Berücksichtigung von Konvektion und Diffusion
     [dOmegadx, dOmegady] = gradient(Omega);  % Gradienten der Wirbelstärke
@@ -11,5 +15,7 @@ function Omega = tgv_updateVorticity(U, V, Omega, options, dt)
     diffusion = options.nu * laplacian_Omega;
 
     % Aktualisierung der Wirbelstärke (expliziter Euler-Schritt)
-    Omega = Omega + dt * (diffusion - convection);
+    % Omega = Omega + dt * (diffusion - convection);
+    Omega = reshape(Omega(:) + dt * (diffusion(:) - convection(:)).*(~w .* Omega(:) + w .* (-(laplacian_Omega(:)) .*Psi(:))),[options.x_nr, options.y_nr]);
+
 end
