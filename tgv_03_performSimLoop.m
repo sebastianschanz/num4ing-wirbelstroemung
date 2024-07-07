@@ -5,7 +5,7 @@ function tgv_03_performSimLoop(X, Y, Omega, options)
     colors = tgv_initColors(Y);
 
     time = linspace(0, options.t_end, options.t_nr); % Zeitdiskretisierung
-    dt = time(2) - time(1); % Zeitschrittgröße
+    dt = options.t_end / options.t_nr; % Zeitschrittweite
     X_pos = X; % Anfangsposition der Partikel in x-Richtung
     Y_pos = Y; % Anfangsposition der Partikel in y-Richtung
     X_pos_a = X; % Anfangsposition der Partikel in x-Richtung (analytisch)
