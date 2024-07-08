@@ -15,6 +15,7 @@ function tgv_03_performSimLoop(X, Y, Omega, options)
     fig = figure;
 
     for t = time
+        disp(['Current time step: ', num2str(t)]); % Debug statement
         % Überprüfen, ob die Figur noch gültig ist
         if ~isvalid(fig)
             break;
