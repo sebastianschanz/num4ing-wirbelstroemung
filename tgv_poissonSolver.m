@@ -1,73 +1,22 @@
-function Psi = tgv_poissonSolver(Omega, options)
-    % Erzeugung des Boolschen Vektors B
-    B = ones(options.x_nr, options.y_nr); 
-    B(2:end-1, 2:end-1) = 0;
+function Psi = tgv_poissonSolver(Omega, D2x, D2y)
+    % Lösen der Poisson-Gleichung mit periodischen Randbedingungen
 
-    % Initialisierung des Druckfelds für die Poisson-Gleichung
-    max_iter = 100;  % Maximale Anzahl an Iterationen zur Lösung der Poisson-Gleichung
-    tol = 1e-12;  % Toleranz für das Abbruchkriterium
-    Psi = zeros(size(Omega)); % Initialisierung des Druckfelds Psi
+    % Aufstellen der Systemmatrix
+    A = D2x + D2y;
     
-    % Erzeugung der Differenzmatrizen für zweite Ableitungen
-    D2x = tgv_createD2Matrix(options.x_nr, options.y_nr, 'x');
-    D2y = tgv_createD2Matrix(options.x_nr, options.y_nr, 'y');
+    % Fixing the singular matrix problem by modifying one equation (periodic BC)
+    A(1, :) = 0; 
+    A(1, 1) = 1; 
+    b = -Omega(:);
+    b(1) = 0; 
     
-    for iter = 1:max_iter
-        Psi_old = Psi;
-        
-        % Randbedingungen für Psi anwenden
-        Psi_Rand = 0; %tgv_applyBoundaryConditions(Psi, 'Dirichlet'); 
-        
-        % Reshape matrices to vectors
-        Omega_vec = Omega(:);
-        Psi_Rand_vec = Psi_Rand(:);
-        B_vec = B(:);
-        negB_vec = ~B_vec;
-        
-        % Kombinieren der Differenzmatrizen und des Druckfelds
-        A = diag(negB_vec) * (D2x + D2y) + diag(B_vec);
-        
-        % Rechte Seite der Poisson-Gleichung
-        b = negB_vec .* (-Omega_vec) + B_vec .* Psi_Rand_vec;
-        
-        % Lösen der Poisson-Gleichung
-        psi = A \ b;
-        
-        % Vektor in Matrix umwandeln
-        Psi = reshape(psi, [options.x_nr, options.y_nr]);
+    % LU-Zerlegung der Systemmatrix
+    [L, U] = lu(A);
 
-        % Abbruchkriterium basierend auf der Konvergenz
-        if max(max(abs(Psi - Psi_old))) < tol
-            break;
-        end
-    end
+    % Lösung des linearen Gleichungssystems A * Psi = b mit LU-Zerlegung
+    y = L \ b;
+    psi = U \ y;
+
+    % Rücktransformation in Matrixform
+    Psi = reshape(psi, size(Omega));
 end
-
-
-%function Psi = tgv_poissonSolver(Omega, options)
-%    % Erzeugung des Boolschen Vektors B
-%    B = ones(options.x_nr, options.y_nr); B(2:end-1, 2:end-1) = 0;
-%
-%    % Initialisierung des Druckfelds für die Poisson-Gleichung
-%    max_iter = 100;  % Maximale Anzahl an Iterationen zur Lösung der Poisson-Gleichung
-%    tol = 1e-12;  % Toleranz für das Abbruchkriterium
-%   Psi = zeros(size(Omega)); % Initialisierung des Druckfelds Psi
-%   for iter = 1:max_iter
-%       Psi_old = Psi;
-%       % Iterative Lösung der Poisson-Gleichung, um die 
-%       % Stromfunktion Psi aus der Wirbelstärke Omega zu berechnen
-%       Psi = 0.25 * (circshift(Psi, [1, 0]) + circshift(Psi, [-1, 0]) + circshift(Psi, [0, 1]) + circshift(Psi, [0, -1]) - Omega);
-%       Psi = tgv_applyBoundaryConditions(Psi, 'Dirichlet'); % Randbedingungen für Psi anwenden
-%
-%        % % Psi_Rand bestimmen aus Randbedingungen
-%        % Psi_Rand = 0;
-%
-%        % psi = (diag(~B(:)) * (del2(Omega(:)) + diag(B(:))))\ (~B(:).* (- Omega(:)) + B(:) .* Psi_Rand);
-%        % Psi = reshape(psi ,[options.x_nr, options.y_nr]);
-%
-%        % Abbruchkriterium basierend auf der Konvergenz
-%        if max(max(abs(Psi - Psi_old))) < tol
-%            break;
-%        end
-%    end
-%end

@@ -9,8 +9,8 @@ function tgv_setPlotProperties(ax, titleText, xlabelText, ylabelText, zlabelText
     ylim(ax, [0 2*pi]);  % Y-Achsenlimits setzen
     yticks(ax, [0 pi 2*pi]);
     yticklabels(ax, {'0', '\pi', '2\cdot\pi'});
-    zlim(ax, [-30 30]);  % Z-Achsenlimits setzen
-    zticks(ax, [-30:10:30]);
+    zlim(ax, [-1 1]);  % Z-Achsenlimits setzen
+    zticks(ax, [-1 0 1]);
 
     % Set z-axis label if provided
     if isempty(zlabelText)

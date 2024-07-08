@@ -11,10 +11,17 @@ function tgv_03_performSimLoop(X, Y, Omega, options)
     X_pos_a = X; % Anfangsposition der Partikel in x-Richtung (analytisch)
     Y_pos_a = Y; % Anfangsposition der Partikel in y-Richtung (analytisch)
 
+    % Erstellung der Differenzmatrizen
+    D1x = tgv_createD1Matrix(options.x_nr, options.y_nr, 'x');
+    D1y = tgv_createD1Matrix(options.x_nr, options.y_nr, 'y');
+    D2x = tgv_createD2Matrix(options.x_nr, options.y_nr, 'x');
+    D2y = tgv_createD2Matrix(options.x_nr, options.y_nr, 'y');
+
     % Erstellen eines Figure-Handles
     fig = figure;
 
     for t = time
+        tic;
         disp(['Current time step: ', num2str(t)]); % Debug statement
         % Überprüfen, ob die Figur noch gültig ist
         if ~isvalid(fig)
@@ -22,14 +29,14 @@ function tgv_03_performSimLoop(X, Y, Omega, options)
         end
 
         % Berechnung der numerischen Stromfunktion
-        Psi = tgv_poissonSolver(Omega, options);
+        Psi = tgv_poissonSolver(Omega, D2x, D2y);
 
         % Aktualisierung der Partikelpositionen (numerisch)
-        [U, V] = tgv_updateVelocity(Psi, options);
+        [U, V] = tgv_updateVelocity(Psi, D1x, D1y, options);
         [X_pos, Y_pos] = tgv_updatePosition(X_pos, Y_pos, U, V, dt, X, Y);
 
         % Aktualisierung der Wirbelstärke (numerisch)
-        Omega = tgv_updateVorticity(U, V, Omega, options, Psi, dt);
+        Omega = tgv_updateVorticity(U, V, Omega, D1x, D1y, D2x, D2y, options, dt);
 
         % Berechnung der analytischen Lösung
         [U_a, V_a, Psi_a] = tgv_computeAnalytical(X, Y, t, options.nu);
@@ -51,6 +58,8 @@ function tgv_03_performSimLoop(X, Y, Omega, options)
         sgtitle(['$\nu=', num2str(options.nu), ',~t=', num2str(t, '%.2f'), '$'], 'Interpreter', 'latex');
 
         drawnow;
+        elapsedTime = toc;
+        disp(['Computation Time: ', num2str(elapsedTime), 'sec.']); % Debug statement
     end
 
     % Schließen der Figur am Ende der Schleife
