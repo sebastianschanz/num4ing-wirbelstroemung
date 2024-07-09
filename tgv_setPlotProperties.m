@@ -1,16 +1,16 @@
-function tgv_setPlotProperties(ax, titleText, xlabelText, ylabelText, zlabelText)
+function tgv_setPlotProperties(ax, titleText, xlabelText, ylabelText, zlabelText, options)
     % Plot-Einstellungen
     title(ax, titleText, 'Interpreter', 'latex', 'FontSize', 12);  % Titel setzen
     xlabel(ax, xlabelText, 'Interpreter', 'latex');  % X-Achsenbeschriftung
     ylabel(ax, ylabelText, 'Interpreter', 'latex');  % Y-Achsenbeschriftung
-    xlim(ax, [0 2*pi]);  % X-Achsenlimits setzen
+    xlim(ax, [options.x_min options.x_max]);  % X-Achsenlimits setzen
     xticks(ax, [0 pi 2*pi]);
     xticklabels(ax, {'0', '\pi', '2\cdot\pi'});
-    ylim(ax, [0 2*pi]);  % Y-Achsenlimits setzen
+    ylim(ax, [options.y_min options.y_max]);  % Y-Achsenlimits setzen
     yticks(ax, [0 pi 2*pi]);
     yticklabels(ax, {'0', '\pi', '2\cdot\pi'});
-    zlim(ax, [-1 1]);  % Z-Achsenlimits setzen
-    zticks(ax, [-1 0 1]);
+    zlim(ax, [options.z_min options.z_max]);  % Z-Achsenlimits setzen
+    zticks(ax, [-5 0 5]);
 
     % Set z-axis label if provided
     if isempty(zlabelText)

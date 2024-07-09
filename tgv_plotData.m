@@ -1,4 +1,4 @@
-function tgv_plotData(ax, X, Y, data, plotType, titleText, xlabelText, ylabelText, zlabelText)
+function tgv_plotData(ax, X, Y, data, plotType, titleText, xlabelText, ylabelText, zlabelText, options)
     % Generalisierte Plot-Funktion
     % Überprüfen, ob ax ein gültiger Achsen-Handle ist
     if isempty(ax) || ~all(isgraphics(ax))
@@ -19,7 +19,7 @@ function tgv_plotData(ax, X, Y, data, plotType, titleText, xlabelText, ylabelTex
     % Farbkarte auf 'jet' setzen
     colormap(ax, jet); 
     % Plot-Eigenschaften setzen (Titel, Achsenbeschriftungen)
-    tgv_setPlotProperties(ax, titleText, xlabelText, ylabelText, zlabelText);
+    tgv_setPlotProperties(ax, titleText, xlabelText, ylabelText, zlabelText, options);
 
     % 3D-Ansicht für Oberflächenplots setzen
     if strcmp(plotType, 'surf')
