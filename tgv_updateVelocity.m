@@ -1,7 +1,10 @@
 function [U, V] = tgv_updateVelocity(Psi, D1x, D1y, options)
-    % Berechnung der Geschwindigkeitskomponenten aus der Stromfunktion Psi
-    U = D1y * Psi(:);  % Geschwindigkeit U aus der Stromfunktion
-    V = -D1x * Psi(:);  % Geschwindigkeit V aus der Stromfunktion
+    % Diese Funktion berechnet die Geschwindigkeitskomponenten U und V
+    % aus der Stromfunktion Psi.
+
+    % Berechnung der Geschwindigkeiten U und V aus der Stromfunktion Psi
+    U = D1y * Psi(:);
+    V = -D1x * Psi(:);
 
     % Rücktransformation in Matrixform
     U = reshape(U, [options.x_nr, options.y_nr]);

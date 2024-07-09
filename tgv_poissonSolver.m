@@ -1,10 +1,10 @@
 function Psi = tgv_poissonSolver(Omega, D2x, D2y)
-    % Lösen der Poisson-Gleichung mit periodischen Randbedingungen
+    % Diese Funktion löst die Poisson-Gleichung mit periodischen Randbedingungen
+    % und gibt die Stromfunktion Psi zurück.
 
     % Aufstellen der Systemmatrix
     A = D2x + D2y;
     
-    % Fixing the singular matrix problem by modifying one equation (periodic BC)
     A(1, :) = 0; 
     A(1, 1) = 1; 
     b = -Omega(:);

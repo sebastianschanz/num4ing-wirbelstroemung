@@ -1,4 +1,8 @@
 function Omega = tgv_updateVorticity(U, V, Omega, D1x, D1y, D2x, D2y, options, dt)
+    % Diese Funktion aktualisiert die Wirbelstärke Omega basierend auf der
+    % Wirbeltransportgleichung und unter Berücksichtigung von Konvektion
+    % und Diffusion.
+
     % Berechnung der neuen Wirbelstärke mithilfe der Wirbeltransportgleichung
     % unter Berücksichtigung von Konvektion und Diffusion
     dOmegadx = D1x * Omega(:);
@@ -16,4 +20,10 @@ function Omega = tgv_updateVorticity(U, V, Omega, D1x, D1y, D2x, D2y, options, d
 
     % Rücktransformation in Matrixform
     Omega = reshape(Omega, [options.x_nr, options.y_nr]);
+
+    % Ensure periodic boundary conditions for vorticity matrix
+    Omega(:, 1) = Omega(:, end-1);
+    Omega(:, end) = Omega(:, 2);
+    Omega(1, :) = Omega(end-1, :);
+    Omega(end, :) = Omega(2, :);
 end
