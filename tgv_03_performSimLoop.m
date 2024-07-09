@@ -1,67 +1,78 @@
-function tgv_03_performSimLoop(X, Y, Omega, options)
-    % Hauptsimulationsschleife
+function tgv_03_performSimLoop(X, Y, U_a, V_a, Psi_a, options)
+    colors = tgv_initColors(Y, options);
 
-    % Einmalige Initialisierung der Farben basierend auf den Y-Positionen
-    colors = tgv_initColors(Y);
+    % Create differentiation matrices
+    D1x = tgv_createD1Matrix(options, 'x');
+    D1y = tgv_createD1Matrix(options, 'y');
+    D2x = tgv_createD2Matrix(options, 'x');
+    D2y = tgv_createD2Matrix(options, 'y');
 
-    time = linspace(0, options.t_end, options.t_nr); % Zeitdiskretisierung
-    dt = options.t_end / options.t_nr; % Zeitschrittweite
-
-    % Initialisierung der Partikelpositionen
+    % Initialize particle positions
     X_pos = X;
     Y_pos = Y;
     X_pos_a = X;
     Y_pos_a = Y;
 
-    % Erstellung der Differenzmatrizen für die Ableitungen in x- und y-Richtung
-    D1x = tgv_createD1Matrix(options.x_nr, options.y_nr, 'x');
-    D1y = tgv_createD1Matrix(options.x_nr, options.y_nr, 'y');
-    D2x = tgv_createD2Matrix(options.x_nr, options.y_nr, 'x');
-    D2y = tgv_createD2Matrix(options.x_nr, options.y_nr, 'y');
+    % Initialize numerical variables
+    U = U_a(0);
+    V = V_a(0);
+    Psi = Psi_a(0);
 
-    % Erstellen eines Figure-Handles für die Plots
+    % Ensure u and v are column vectors
+    u = U(:);
+    v = V(:);
+
+    % Calculate initial vorticity using differentiation matrices
+    dVdx = D1x * v;
+    dUdy = D1y * u;
+    omega = dVdx - dUdy;
+    Omega = reshape(omega, [options.x_nr, options.y_nr]);
+
     fig = figure;
 
-    for t = time
-        tic; % Start der Zeitmessung für einen Zeitschritt
-        disp(['Aktueller Zeitschritt: ', num2str(t)]); % Debug-Ausgabe des aktuellen Zeitschritts
+    for t = linspace(0, options.t_end, options.t_nr)
+        tic;
+        disp(['Aktueller Zeitschritt: ', num2str(t)]);
 
-        % Überprüfen, ob die Figur noch gültig ist
         if ~isvalid(fig)
             break;
         end
 
-        % Berechnung der numerischen Stromfunktion durch Lösung der Poisson-Gleichung
+        % Update analytical solution
+        U_a_now = U_a(t);
+        V_a_now = V_a(t);
+        Psi_a_now = Psi_a(t);
+
+        % Update particle positions (analytical)
+        [X_pos_a, Y_pos_a] = tgv_updatePosition(X_pos_a, Y_pos_a, U_a_now, V_a_now, X, Y, options);
+
+        % Plot analytical solution
+        tgv_plotData(subplot(2, 2, 3), X_pos_a, Y_pos_a, colors, 'scatter', 'Lagrange Partikel (Analytisch)', 'x', 'y', '', options);
+        tgv_plotData(subplot(2, 2, 4), X, Y, Psi_a_now, 'surf', 'Stromfunktion (Analytisch)', 'x', 'y', '$\Psi$', options);
+
+        % Update particle positions (numerical)
+        [X_pos, Y_pos] = tgv_updatePosition(X_pos, Y_pos, U, V, X, Y, options);
+
+        % Update vorticity
+        Omega = tgv_updateVorticity(U, V, Omega, D1x, D1y, D2x, D2y, options);
+
+        % Solve Poisson equation for stream function
         Psi = tgv_poissonSolver(Omega, D2x, D2y);
 
-        % Aktualisierung der Partikelpositionen (numerisch)
-        [U, V] = tgv_updateVelocity(Psi, D1x, D1y, options); % Berechnung der Geschwindigkeitskomponenten aus der Stromfunktion
-        [X_pos, Y_pos] = tgv_updatePosition(X_pos, Y_pos, U, V, dt, X, Y); % Aktualisierung der Partikelpositionen
+        % Update velocities from stream function
+        [U, V] = tgv_updateVelocity(Psi, D1x, D1y, options);
 
-        % Aktualisierung der Wirbelstärke (numerisch) unter Berücksichtigung von Diffusion und Konvektion
-        Omega = tgv_updateVorticity(U, V, Omega, D1x, D1y, D2x, D2y, options, dt);
+        % Plot numerical solution
+        tgv_plotData(subplot(2, 2, 1), X_pos, Y_pos, colors, 'scatter', 'Lagrange Partikel (Numerisch)', 'x', 'y', '', options);
+        tgv_plotData(subplot(2, 2, 2), X, Y, Psi, 'surf', 'Stromfunktion (Numerisch)', 'x', 'y', '$\Psi$', options);
 
-        % Berechnung der analytischen Lösung für die Geschwindigkeitskomponenten und die Stromfunktion
-        [U_a, V_a, Psi_a] = tgv_computeAnalytical(X, Y, t, options.nu);
-        [X_pos_a, Y_pos_a] = tgv_updatePosition(X_pos_a, Y_pos_a, U_a, V_a, dt, X, Y); % Aktualisierung der Partikelpositionen (analytisch)
-
-        % Plot der numerischen Lösung (Lagrange-Partikel und Stromfunktion)
-        tgv_plotData(subplot(2, 2, 1), X_pos, Y_pos, colors, 'scatter', 'Lagrange Partikel (Numerisch)', 'x', 'y', '');
-        tgv_plotData(subplot(2, 2, 2), X, Y, Psi, 'surf', 'Stromfunktion (Numerisch)', 'x', 'y', '$\Psi$');
-
-        % Plot der analytischen Lösung (Lagrange-Partikel und Stromfunktion)
-        tgv_plotData(subplot(2, 2, 3), X_pos_a, Y_pos_a, colors, 'scatter', 'Lagrange Partikel (Analytisch)', 'x', 'y', '');
-        tgv_plotData(subplot(2, 2, 4), X, Y, Psi_a, 'surf', 'Stromfunktion (Analytisch)', 'x', 'y', '$\Psi$');
-
-        % Hinzufügen eines Gesamttitels mit Viskosität und Zeit
         sgtitle(['$\nu=', num2str(options.nu), ',~t=', num2str(t, '%.2f'), '$'], 'Interpreter', 'latex');
 
-        drawnow; % Aktualisierung der Plots
-        elapsedTime = toc; % Ende der Zeitmessung für einen Zeitschritt
-        disp(['Berechnungszeit: ', num2str(elapsedTime), ' Sekunden']); % Debug-Ausgabe der Berechnungszeit
+        drawnow;
+        elapsedTime = toc;
+        disp(['Berechnungszeit: ', num2str(elapsedTime), ' Sekunden']);
     end
 
-    % Schließen der Figur am Ende der Schleife
     if isvalid(fig)
         close(fig);
     end
