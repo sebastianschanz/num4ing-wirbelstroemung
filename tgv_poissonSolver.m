@@ -13,7 +13,7 @@ function Psi = tgv_poissonSolver(Omega, D2x, D2y)
     % LU-Zerlegung der Systemmatrix
     [L, U] = lu(A);
 
-    % Lösung des linearen Gleichungssystems A * Psi = b mit LU-Zerlegung
+    % Lösung des linearen Gleichungssystems A * psi = b mit LU-Zerlegung
     y = L \ b;
     psi = U \ y;
 

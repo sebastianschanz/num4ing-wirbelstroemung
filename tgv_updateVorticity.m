@@ -1,29 +1,23 @@
-function Omega = tgv_updateVorticity(U, V, Omega, D1x, D1y, D2x, D2y, options, dt)
-    % Diese Funktion aktualisiert die Wirbelstärke Omega basierend auf der
-    % Wirbeltransportgleichung und unter Berücksichtigung von Konvektion
-    % und Diffusion.
+function Omega = tgv_updateVorticity(U, V, Omega, D1x, D1y, D2x, D2y, options)
+    % Umwandlung der Wirbelstärke in Vektorform
+    omega = Omega(:);
 
-    % Berechnung der neuen Wirbelstärke mithilfe der Wirbeltransportgleichung
-    % unter Berücksichtigung von Konvektion und Diffusion
-    dOmegadx = D1x * Omega(:);
-    dOmegady = D1y * Omega(:);
-    laplacian_Omega = D2x * Omega(:) + D2y * Omega(:);
+    % Berechnung der Gradienten von omega
+    domegadx = D1x * omega;
+    domegady = D1y * omega;
+
+    % Berechnung des Laplacians von omega
+    laplacian_omega = D2x * omega + D2y * omega;
 
     % Konvektionsterm: Transport der Wirbelstärke durch die Strömung
-    convection = U(:) .* dOmegadx + V(:) .* dOmegady;
+    convection = U(:) .* domegadx + V(:) .* domegady;
 
     % Diffusionsterm: Viskose Ausbreitung der Wirbelstärke
-    diffusion = options.nu * laplacian_Omega;
+    diffusion = options.nu * laplacian_omega;
 
     % Aktualisierung der Wirbelstärke (expliziter Euler-Schritt)
-    Omega = Omega(:) + dt * (diffusion - convection);
+    omega = omega + options.dt * (diffusion - convection);
 
     % Rücktransformation in Matrixform
-    Omega = reshape(Omega, [options.x_nr, options.y_nr]);
-
-    % Ensure periodic boundary conditions for vorticity matrix
-    Omega(:, 1) = Omega(:, end-1);
-    Omega(:, end) = Omega(:, 2);
-    Omega(1, :) = Omega(end-1, :);
-    Omega(end, :) = Omega(2, :);
+    Omega = reshape(omega, [options.x_nr, options.y_nr]);
 end
