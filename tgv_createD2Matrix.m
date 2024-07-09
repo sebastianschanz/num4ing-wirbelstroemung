@@ -1,22 +1,24 @@
-function D2 = tgv_createD2Matrix(nx, ny, direction)
-    % Diese Funktion erstellt die zweite Differenzenmatrix für die x- oder y-Richtung.
+function D2 = tgv_createD2Matrix(options, direction)
     if strcmp(direction, 'x')
-        e = ones(nx, 1); % Vektor von Einsen
-        h = 2 * pi / nx; % Schrittweite
-        % Zweite Ableitungsmatrix für die x-Richtung
-        T = spdiags([e -2*e e], [-1 0 1], nx, nx) / (h^2);
-        T(nx, 1) = 1 / (h^2); % Periodische Randbedingung (linker Rand)
-        T(1, nx) = 1 / (h^2); % Periodische Randbedingung (rechter Rand)
-        I = speye(ny); % Einheitsmatrix
-        D2 = kron(I, T); % Kronecker-Produkt zur Erweiterung auf 2D
+        N = options.x_nr;
+        ds = options.dx;
     elseif strcmp(direction, 'y')
-        e = ones(ny, 1); % Vektor von Einsen
-        h = 2 * pi / ny; % Schrittweite
-        % Zweite Ableitungsmatrix für die y-Richtung
-        T = spdiags([e -2*e e], [-1 0 1], ny, ny) / (h^2);
-        T(ny, 1) = 1 / (h^2); % Periodische Randbedingung (oberer Rand)
-        T(1, ny) = 1 / (h^2); % Periodische Randbedingung (unterer Rand)
-        I = speye(nx); % Einheitsmatrix
-        D2 = kron(T, I); % Kronecker-Produkt zur Erweiterung auf 2D
+        N = options.y_nr;
+        ds = options.dy;
+    end
+    
+    e = ones(N, 1);
+    % Second-order central difference with periodic boundary conditions
+    T = spdiags([e -2*e e], [-1 0 1], N, N) / (ds^2);
+    T(1, end) = 1 / (ds^2); % Periodic BC
+    T(end, 1) = 1 / (ds^2); % Periodic BC
+    
+    % Kronecker product for 2D extension
+    if strcmp(direction, 'x')
+        I = speye(options.y_nr);
+        D2 = kron(I, T);
+    elseif strcmp(direction, 'y')
+        I = speye(options.x_nr);
+        D2 = kron(T, I);
     end
 end
