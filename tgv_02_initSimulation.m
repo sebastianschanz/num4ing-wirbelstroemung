@@ -1,13 +1,23 @@
-function [X, Y, U_a, V_a, Psi_a] = tgv_02_initSimulation(options)
+function [X, Y, U_a, V_a, Psi_a, B, W] = tgv_02_initSimulation(options)
     % Initialisierung der Simulationsvariablen für den Taylor-Green-Wirbel
     x = linspace(options.x_min, options.x_max, options.x_nr);
     y = linspace(options.y_min, options.y_max, options.y_nr);
     [X, Y] = meshgrid(x, y);
 
     % Analytische Lösung des Taylor-Green-Vortex
-    U_a = @(t) sin(X) .* cos(Y) .* exp(-2 * options.nu * t);
-    V_a = @(t) -cos(X) .* sin(Y) .* exp(-2 * options.nu * t);
-    Psi_a = @(t) sin(X) .* sin(Y) .* exp(-2 * options.nu * t);
+    U_a = @(t) sin(X) .* cos(Y) .* exp(-2 * options.nu * t); % Analytische Geschwindigkeitskomponente U
+    V_a = @(t) -cos(X) .* sin(Y) .* exp(-2 * options.nu * t); % Analytische Geschwindigkeitskomponente V
+    Psi_a = @(t) sin(X) .* sin(Y) .* exp(-2 * options.nu * t); % Analytische Stromfunktion
+
+    % Definition des Boolschen Vektors für die Poisson-Gleichung
+    B = false(options.x_nr, options.y_nr);
+    B(:, 1) = true;    % Linke Wand
+    B(:, end) = true;   % Rechte Wand
+    B(1, :) = true;  % Untere Wand
+    B(end, :) = true;     % Obere Wand
+
+    % Definition des Boolschen Vektors für die Cauchy-Riemann Gleichung
+    W = B;
 end
 
 

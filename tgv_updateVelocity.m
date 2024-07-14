@@ -1,10 +1,13 @@
-function [U, V] = tgv_updateVelocity(Psi, D1x, D1y, options)
-    % Diese Funktion berechnet die Geschwindigkeitskomponenten U und V
-    % aus der Stromfunktion Psi.
+function [U, V] = tgv_updateVelocity(Psi, D1x, D1y, U, V, W, options)
+    % Umrechnung der Stromfunktion Ψ in die einzelnen Geschwindigkeitskomponenten 
+    % u und v anhand der Cauchy-Riemann-Gleichungen.
 
-    % Berechnung der Geschwindigkeiten U und V aus der Stromfunktion Psi
-    u = D1y * Psi(:);
-    v = -D1x * Psi(:);
+    % Vektorisierung der Matrizen
+    psi = Psi(:); u = U(:); v = V(:);
+
+    % Geschwindigkeiten U und V aus Psi
+    u = ~W(:) .* (D1y * psi) + W(:) .* u; % u = ∂ψ/∂y
+    v = ~W(:) .* (-D1x * psi) + W(:) .* v; % v = -∂ψ/∂x
 
     % Rücktransformation in Matrixform
     U = reshape(u, [options.x_nr, options.y_nr]);

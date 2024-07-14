@@ -8,12 +8,12 @@ function D2 = tgv_createD2Matrix(options, direction)
     end
     
     e = ones(N, 1);
-    % Second-order central difference with periodic boundary conditions
+    % Zentraldifferenzen 2. Ordnung mit periodischen Randbedingungen
     T = spdiags([e -2*e e], [-1 0 1], N, N) / (ds^2);
-    T(1, end) = 1 / (ds^2); % Periodic BC
-    T(end, 1) = 1 / (ds^2); % Periodic BC
+    T(1, end) = 1 / (ds^2); % Periodische BC
+    T(end, 1) = 1 / (ds^2); % Periodische BC
     
-    % Kronecker product for 2D extension
+    % Kronecker Produkt für 2D Erweiterung
     if strcmp(direction, 'x')
         I = speye(options.y_nr);
         D2 = kron(I, T);

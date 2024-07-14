@@ -1,14 +1,13 @@
 function options = tgv_01_configureSimulation()
     % Definition der Simulationsparameter
     nu = 0.01; % Kinematische Viskosität
-    t_end = 5; % Endzeit der Simulation
-    t_nr = 100; % Anzahl der Zeitschritte
-    x_nr = 100; % Anzahl der Gitterpunkte in x-Richtung
-    y_nr = 100; % Anzahl der Gitterpunkte in y-Richtung
+    t_end = 4; % Endzeit der Simulation
+    t_nr = 50; % Anzahl der Zeitschritte
+    x_nr = 50; % Anzahl der Gitterpunkte in x-Richtung
+    y_nr = 50; % Anzahl der Gitterpunkte in y-Richtung
     x_min = 0; x_max = 2 * pi; % Intervallgrenzen in x-Richtung
     y_min = 0; y_max = 2 * pi; % Intervallgrenzen in y-Richtung
-    z_min = -5; z_max = 5; % Intervallgrenzen in z-Richtung
-    b_type = 'periodic'; % Randbedingungen
+    z_min = -1; z_max = 1; % Intervallgrenzen in z-Richtung
     i_meth = 'expliziter-euler'; % Integrationsmethode
     scheme = 'parula'; % Colormap für die Plots
 
@@ -27,7 +26,6 @@ function options = tgv_01_configureSimulation()
         'z_max', z_max, ...
         'dx', (x_max - x_min) / (x_nr - 1), ...
         'dy', (y_max - y_min) / (y_nr - 1), ...
-        'boundary_type', b_type, ...  % Randbedingungen
         'method', i_meth, ...  % Integrationsmethode
         'colormap', scheme ...      % Colormap für die Plots
     );
