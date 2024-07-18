@@ -1,80 +1,66 @@
 function tgv_03_performSimLoop(X, Y, U_a, V_a, Psi_a, B, W, options)
     colors = tgv_initColors(Y, options);
 
-    % Create differentiation matrices
-    D1x = tgv_createD1Matrix(options, 'x');
-    D1y = tgv_createD1Matrix(options, 'y');
-    D2x = tgv_createD2Matrix(options, 'x');
-    D2y = tgv_createD2Matrix(options, 'y');
-
-    % Aufstellen der Systemmatrix für die Poisson-Gleichung
-    A = diag(~B(:)) * (D2x + D2y) + diag(B(:)); % ∇²ψ
-
-    % LU-Zerlegung der Systemmatrix
-    [A_L, A_U] = lu(A);
-
-    % Initialize particle positions
+    % Partikelpositionen initialisieren
     X_pos = X;
     Y_pos = Y;
     X_pos_a = X;
     Y_pos_a = Y;
 
-    % Numerische Lösung initialisieren
-    U = U_a(0);
-    V = V_a(0);
-    Psi = Psi_a(0);
+    % Erstellen der Ableitungsmatrizen D1x, D1y, D2x und D2y
+    [D1x, D1y, D2x, D2y] = tgv_createDiffMatrices(options);
 
-    % Spaltenvektoren aus den Geschwindigkeitsfeldern erstellen
-    u = U(:);
-    v = V(:);
+    % Aufstellen und Zerlegen der Systemmatrix für die Poisson-Gleichung
+    A = diag(~B(:)) * (D2x + D2y) + diag(B(:)); % ∇² = ∂²/∂x² + ∂²/∂y²
+    [A_L, A_U] = lu(A);                         % LU-Zerlegung der Systemmatrix
 
-    % Berechnung der initialen Wirbelstärke mit Ableitungsmatrizen D1x und D1y
-    dVdx = D1x * v; % Partielle Ableitung von v nach x (v_x)
-    dUdy = D1y * u; % Partielle Ableitung von u nach y (u_y)
-    omega = dVdx - dUdy; % Wirbelstärke: ω_z = ∂v/∂x - ∂u/∂y
-    Omega = reshape(omega, [options.x_nr, options.y_nr]); % Rücktransformation in Matrixform
-
-    % Analytische Wirbelstärke
-    % Omega_a = 2 * sin(X) .* sin(Y); % Analytische Wirbelstärke
-    % Omega = Omega_a; % Initialisierung der Wirbelstärke
+    % Numerische Lösung mit analytischer vorinitialisieren
+    U = U_a(0);                                 % U = sin(X) .* cos(Y) * F_t
+    V = V_a(0);                                 % V = -cos(X) .* sin(Y) * F_t
+    Psi = Psi_a(0);                             % ψ = sin(X) .* sin(Y) * F_t
+    Omega_vec = -(D2x * Psi(:) + D2y * Psi(:)); % ω = -∇²ψ  
+    Omega = reshape(Omega_vec, size(X));        % in Matrix umwandeln
 
     fig = figure;
+    time = linspace(0, options.t_end, options.t_nr); % Zeitvektor erstellen
 
-    for t = linspace(0, options.t_end, options.t_nr)
+    for t = time
         tic;
-        disp(['Aktueller Zeitschritt: ', num2str(t)]);
+        disp(['Aktueller Zeitschritt: ', num2str(t)]); % Aktuellen Zeitschritt ausgeben
 
         if ~isvalid(fig)
             break;
         end
 
-        % Update analytical solution
+        %%% ANALYTISCHE LÖSUNG %%%
+        % Analytische Lösung für t aktualisieren
         U_a_now = U_a(t);
         V_a_now = V_a(t);
         Psi_a_now = Psi_a(t);
 
-        % Update particle positions (analytical)
+        % Partikelpositionen der analytischen Lösung aktualisieren
         [X_pos_a, Y_pos_a] = tgv_updatePosition(X_pos_a, Y_pos_a, U_a_now, V_a_now, X, Y, options);
 
-        % Plot analytical solution
+        % Analytische Lösung plotten als Lagrange-Partikel und Stromfunktion
         tgv_plotData(subplot(2, 2, 3), X_pos_a, Y_pos_a, colors, 'scatter', 'Lagrange Partikel (Analytisch)', 'x', 'y', '', options);
         tgv_plotData(subplot(2, 2, 4), X, Y, Psi_a_now, 'surf', 'Stromfunktion (Analytisch)', 'x', 'y', '$\Psi$', options);
 
-        % Update particle positions (numerical)
+        %%% NUMERISCHE LÖSUNG %%%
+        % Mit Wirbelstärke ω Poisson-Gleichung lösen, um die Stromfunktion ψ zu aktualisieren
+        Psi = tgv_updateStream(Omega, A_L, A_U, Psi, B);
+
+        % Geschwindigkeitsfeld U und V aktualisieren
+        [U, V] = tgv_updateVelocity(Psi, D1x, D1y, U, V, W, options);
+
+        % Wirbelstärke ω aktualisieren
+        Omega = tgv_updateVorticity(U, V, Omega, Psi, D1x, D1y, D2x, D2y, W, options);
+
+        % Partikelpositionen aktualisieren
         [X_pos, Y_pos] = tgv_updatePosition(X_pos, Y_pos, U, V, X, Y, options);
         X_pos = tgv_applyBC(X_pos, 'periodic');
         Y_pos = tgv_applyBC(Y_pos, 'periodic');
 
-        % Update vorticity
-        Omega = tgv_updateVorticity(U, V, Omega, Psi, D1x, D1y, D2x, D2y, W, options);
-
-        % Solve Poisson equation for stream function
-        Psi = tgv_updateStream(Omega, A_L, A_U, Psi, B);
-
-        % Update velocities from stream function
-        [U, V] = tgv_updateVelocity(Psi, D1x, D1y, U, V, W, options);
-
-        % Plot numerical solution
+        % Numerische Lösung plotten als Lagrange-Partikel und Stromfunktion
         tgv_plotData(subplot(2, 2, 1), X_pos, Y_pos, colors, 'scatter', 'Lagrange Partikel (Numerisch)', 'x', 'y', '', options);
         tgv_plotData(subplot(2, 2, 2), X, Y, Psi, 'surf', 'Stromfunktion (Numerisch)', 'x', 'y', '$\Psi$', options);
 
