@@ -1,32 +1,25 @@
 function options = tgv_01_configureSimulation()
-    % Definition der Simulationsparameter
-    nu = 0.01; % Kinematische Viskosität
-    t_end = 4; % Endzeit der Simulation
-    t_nr = 50; % Anzahl der Zeitschritte
-    x_nr = 50; % Anzahl der Gitterpunkte in x-Richtung
-    y_nr = 50; % Anzahl der Gitterpunkte in y-Richtung
-    x_min = 0; x_max = 2 * pi; % Intervallgrenzen in x-Richtung
-    y_min = 0; y_max = 2 * pi; % Intervallgrenzen in y-Richtung
-    z_min = -1; z_max = 1; % Intervallgrenzen in z-Richtung
-    i_meth = 'expliziter-euler'; % Integrationsmethode
-    scheme = 'parula'; % Colormap für die Plots
+    options.nu = 0.02; % Kinematische Viskosität
+    options.x_nr = 50; % Anzahl der Gitterpunkte in x-Richtung
+    options.y_nr = 50; % Anzahl der Gitterpunkte in y-Richtung
 
-    options = struct( ...
-        'nu', nu, ...                
-        't_end', t_end, ...            
-        't_nr', t_nr, ...              
-        'dt', t_end / t_nr, ...        
-        'x_nr', x_nr, ...              
-        'y_nr', y_nr, ...              
-        'x_min', x_min, ...            
-        'x_max', x_max, ...
-        'y_min', y_min, ...
-        'y_max', y_max, ...
-        'z_min', z_min, ...
-        'z_max', z_max, ...
-        'dx', (x_max - x_min) / (x_nr - 1), ...
-        'dy', (y_max - y_min) / (y_nr - 1), ...
-        'method', i_meth, ...  % Integrationsmethode
-        'colormap', scheme ...      % Colormap für die Plots
-    );
+    % Intervallgrenzen in x-, y- und z-Richtung
+    options.x_min = 0;
+    options.x_max = 2 * pi;
+    options.y_min = 0;
+    options.y_max = 2 * pi;
+    options.z_min = -1;
+    options.z_max = 1;
+    
+    % Gitterabstände in x- und y-Richtung
+    options.dx = (options.x_max - options.x_min) / (options.x_nr - 1);
+    options.dy = (options.y_max - options.y_min) / (options.y_nr - 1);
+
+    % Endzeit, Anzahl der Zeitschritte und Zeitschrittweite
+    options.t_end = 5;
+    options.t_nr = 100;
+    options.dt = options.t_end / options.t_nr;
+ 
+    options.method = 'expliziter-euler'; % Integrationsmethode
+    options.colormap = 'parula'; % Colormap für die Plots
 end
