@@ -1,5 +1,5 @@
 function tgv_03_performSimLoop(X, Y, U_a, V_a, Psi_a, B, W, options)
-    colors = tgv_initColors(Y, options);
+    colors = tgv_initColors(Y, options); 
 
     % Partikelpositionen initialisieren
     X_pos = X;
@@ -21,7 +21,9 @@ function tgv_03_performSimLoop(X, Y, U_a, V_a, Psi_a, B, W, options)
     Omega_vec = -(D2x * Psi(:) + D2y * Psi(:)); % ω = -∇²ψ  
     Omega = reshape(Omega_vec, size(X));        % in Matrix umwandeln
 
-    fig = figure;
+    fig = figure; % Figure für die Animation erstellen
+    set(fig, 'Visible', 'off'); % Figure unsichtbar machen
+    gif_filename = 'C:\Users\Sebastian\Documents\00-dev\num4ing\num4ing-wirbelstroemung\simulation.gif'; % GIF-Datei erstellen
     time = linspace(0, options.t_end, options.t_nr); % Zeitvektor erstellen
 
     for t = time
@@ -67,6 +69,17 @@ function tgv_03_performSimLoop(X, Y, U_a, V_a, Psi_a, B, W, options)
         sgtitle(['$\nu=', num2str(options.nu), ',~t=', num2str(t, '%.2f'), '$'], 'Interpreter', 'latex');
 
         drawnow;
+
+        % Capture the plot as an image and write it to the GIF
+        frame = getframe(fig);
+        img = frame2im(frame);
+        [img_ind, cm] = rgb2ind(img, 256);
+        if t == time(1)
+            imwrite(img_ind, cm, gif_filename, 'gif', 'Loopcount', inf, 'DelayTime', 0.1);
+        else
+            imwrite(img_ind, cm, gif_filename, 'gif', 'WriteMode', 'append', 'DelayTime', 0.1);
+        end
+
         elapsedTime = toc;
         disp(['Berechnungszeit: ', num2str(elapsedTime), ' Sekunden']);
     end
