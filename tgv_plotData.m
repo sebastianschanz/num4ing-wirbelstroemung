@@ -17,7 +17,7 @@ function tgv_plotData(ax, X, Y, data, plotType, titleText, xlabelText, ylabelTex
     end
 
     % Farbkarte auf 'jet' setzen
-    colormap(ax, jet); 
+    colormap(ax, options.colormap); 
     % Plot-Eigenschaften setzen (Titel, Achsenbeschriftungen)
     tgv_setPlotProperties(ax, titleText, xlabelText, ylabelText, zlabelText, options);
 
