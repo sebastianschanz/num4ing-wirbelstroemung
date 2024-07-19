@@ -1,45 +1,49 @@
 function [DX, DY] = tgv_Nabla(nx, ny, h)
     N = ny * nx;
-    DX = spalloc(N, N, 5*N); % Reserviert Speicherplatz für nicht-null Einträge
-    DY = spalloc(N, N, 5*N);
+    DX = spalloc(N, N, 4 * N); % Reserviert Speicherplatz für nicht-null Einträge
+    DY = spalloc(N, N, 4 * N);
 
-    % Berechnung der x-Richtung Differenzen (DX)
-    for m = 1:N
-        % Randbedingung am Anfang (erste Zeile)
-        if m <= ny
-            DX(m, m) = -3; % Einseitige Differenz am Rand
-            if m + ny <= N, DX(m, m + ny) = 4; end % Einseitige Differenz am Rand
-            if m + 2 * ny <= N, DX(m, m + 2 * ny) = -1; end % Einseitige Differenz am Rand
-        % Randbedingung am Ende (letzte Zeile)
-        elseif m > (nx - 1) * ny
-            DX(m, m) = 3; % Einseitige Differenz am Rand
-            if m - ny > 0, DX(m, m - ny) = -4; end % Einseitige Differenz am Rand
-            if m - 2 * ny > 0, DX(m, m - 2 * ny) = 1; end % Einseitige Differenz am Rand
-        % Innerhalb des Gitters
-        else
-            if m - ny > 0, DX(m, m - ny) = -1; end % Zentrale Differenz
-            if m + ny <= N, DX(m, m + ny) = 1; end % Zentrale Differenz
-        end
-    end
+    % Zentrale Differenzen in x-Richtung (innen)
+    DX = DX + spdiags([-ones(N, 1), ones(N, 1)], [-ny, ny], N, N);
 
-    % Berechnung der y-Richtung Differenzen (DY)
-    for m = 1:N
-        % Randbedingung am Anfang (erste Spalte)
-        if mod(m, ny) == 1
-            DY(m, m) = -3; % Einseitige Differenz am Rand
-            if m + 1 <= N, DY(m, m + 1) = 4; end % Einseitige Differenz am Rand
-            if m + 2 <= N, DY(m, m + 2) = -1; end % Einseitige Differenz am Rand
-        % Randbedingung am Ende (letzte Spalte)
-        elseif mod(m, ny) == 0
-            DY(m, m) = 3; % Einseitige Differenz am Rand
-            if m - 1 > 0, DY(m, m - 1) = -4; end % Einseitige Differenz am Rand
-            if m - 2 > 0, DY(m, m - 2) = 1; end % Einseitige Differenz am Rand
-        % Innerhalb des Gitters
-        else
-            if m - 1 > 0, DY(m, m - 1) = -1; end % Zentrale Differenz
-            if m + 1 <= N, DY(m, m + 1) = 1; end % Zentrale Differenz
-        end
-    end
+    % Randbedingungen für x-Richtung (erste und letzte Zeile)
+    first_row = (1:ny)';
+    last_row = ((nx - 1) * ny + 1 : N)';
+
+    % Erste Zeile
+    DX(sub2ind([N, N], first_row, first_row)) = -3;
+    valid = first_row + ny <= N;
+    DX(sub2ind([N, N], first_row(valid), first_row(valid) + ny)) = 4;
+    valid = first_row + 2 * ny <= N;
+    DX(sub2ind([N, N], first_row(valid), first_row(valid) + 2 * ny)) = -1;
+
+    % Letzte Zeile
+    DX(sub2ind([N, N], last_row, last_row)) = 3;
+    valid = last_row - ny > 0;
+    DX(sub2ind([N, N], last_row(valid), last_row(valid) - ny)) = -4;
+    valid = last_row - 2 * ny > 0;
+    DX(sub2ind([N, N], last_row(valid), last_row(valid) - 2 * ny)) = 1;
+
+    % Zentrale Differenzen in y-Richtung (innen)
+    DY = DY + spdiags([-ones(N, 1), ones(N, 1)], [-1, 1], N, N);
+
+    % Randbedingungen für y-Richtung (erste und letzte Spalte)
+    first_col = (1:ny:N)';
+    last_col = (ny:ny:N)';
+
+    % Erste Spalte
+    DY(sub2ind([N, N], first_col, first_col)) = -3;
+    valid = first_col + 1 <= N;
+    DY(sub2ind([N, N], first_col(valid), first_col(valid) + 1)) = 4;
+    valid = first_col + 2 <= N;
+    DY(sub2ind([N, N], first_col(valid), first_col(valid) + 2)) = -1;
+
+    % Letzte Spalte
+    DY(sub2ind([N, N], last_col, last_col)) = 3;
+    valid = last_col - 1 > 0;
+    DY(sub2ind([N, N], last_col(valid), last_col(valid) - 1)) = -4;
+    valid = last_col - 2 > 0;
+    DY(sub2ind([N, N], last_col(valid), last_col(valid) - 2)) = 1;
 
     % Normierung der Matrizen durch den Faktor 2 * h
     DX = DX / (2 * h);

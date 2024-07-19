@@ -1,5 +1,6 @@
 function options = tgv_01_configureSimulation()
-    options.nu = 0.02; % Kinematische Viskosität
+    % Funktion zur Konfiguration der Simulationsparameter
+    options.nu = 0.01; % Kinematische Viskosität
     options.x_nr = 50; % Anzahl der Gitterpunkte in x-Richtung
     options.y_nr = 50; % Anzahl der Gitterpunkte in y-Richtung
 
@@ -21,5 +22,7 @@ function options = tgv_01_configureSimulation()
     options.dt = options.t_end / options.t_nr;
  
     options.method = 'expliziter-euler'; % Integrationsmethode
-    options.colormap = 'parula'; % Colormap für die Plots
+    options.colormap = 'parula';         % Colormap für die Plots
+    options.writeGif = false;             % GIF-Datei schreiben
+    options.filename = 'C:\Users\Sebastian\Documents\00-dev\num4ing\num4ing-wirbelstroemung\simulation_breaks.gif'; % Dateiname für die GIF-Datei
 end

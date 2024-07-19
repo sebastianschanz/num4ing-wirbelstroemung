@@ -1,11 +1,10 @@
 function tgv_03_performSimLoop(X, Y, U_a, V_a, Psi_a, B, W, options)
-    colors = tgv_initColors(Y, options); 
+    % Funktion zur Ausführung der Aktualisierungsschleife der Taylor-Green-Wirbel-Simulation
+    colors = tgv_initColors(Y, options); % Farben für die Partikel initialisieren
+    time = linspace(0, options.t_end, options.t_nr); % Zeitvektor erstellen
 
     % Partikelpositionen initialisieren
-    X_pos = X;
-    Y_pos = Y;
-    X_pos_a = X;
-    Y_pos_a = Y;
+    X_pos = X; Y_pos = Y; X_pos_a = X; Y_pos_a = Y;
 
     % Erstellen der Ableitungsmatrizen D1x, D1y, D2x und D2y
     [D1x, D1y, D2x, D2y] = tgv_createDiffMatrices(options);
@@ -22,9 +21,9 @@ function tgv_03_performSimLoop(X, Y, U_a, V_a, Psi_a, B, W, options)
     Omega = reshape(Omega_vec, size(X));        % in Matrix umwandeln
 
     fig = figure; % Figure für die Animation erstellen
-    set(fig, 'Visible', 'off'); % Figure unsichtbar machen
-    gif_filename = 'C:\Users\Sebastian\Documents\00-dev\num4ing\num4ing-wirbelstroemung\simulation.gif'; % GIF-Datei erstellen
-    time = linspace(0, options.t_end, options.t_nr); % Zeitvektor erstellen
+    if options.writeGif
+    set(fig, 'Visible', 'off'); % Figure unsichtbar machen;
+    end
 
     for t = time
         tic;
@@ -36,9 +35,7 @@ function tgv_03_performSimLoop(X, Y, U_a, V_a, Psi_a, B, W, options)
 
         %%% ANALYTISCHE LÖSUNG %%%
         % Analytische Lösung für t aktualisieren
-        U_a_now = U_a(t);
-        V_a_now = V_a(t);
-        Psi_a_now = Psi_a(t);
+        U_a_now = U_a(t); V_a_now = V_a(t); Psi_a_now = Psi_a(t);
 
         % Partikelpositionen der analytischen Lösung aktualisieren
         [X_pos_a, Y_pos_a] = tgv_updatePosition(X_pos_a, Y_pos_a, U_a_now, V_a_now, X, Y, options);
@@ -66,22 +63,15 @@ function tgv_03_performSimLoop(X, Y, U_a, V_a, Psi_a, B, W, options)
         tgv_plotData(subplot(2, 2, 1), X_pos, Y_pos, colors, 'scatter', 'Lagrange Partikel (Numerisch)', 'x', 'y', '', options);
         tgv_plotData(subplot(2, 2, 2), X, Y, Psi, 'surf', 'Stromfunktion (Numerisch)', 'x', 'y', '$\Psi$', options);
 
+        % Titel für die Figure aktualisieren
         sgtitle(['$\nu=', num2str(options.nu), ',~t=', num2str(t, '%.2f'), '$'], 'Interpreter', 'latex');
 
-        drawnow;
-
-        % Capture the plot as an image and write it to the GIF
-        frame = getframe(fig);
-        img = frame2im(frame);
-        [img_ind, cm] = rgb2ind(img, 256);
-        if t == time(1)
-            imwrite(img_ind, cm, gif_filename, 'gif', 'Loopcount', inf, 'DelayTime', 0.1);
-        else
-            imwrite(img_ind, cm, gif_filename, 'gif', 'WriteMode', 'append', 'DelayTime', 0.1);
+        drawnow; % Figure aktualisieren
+        if options.writeGif
+        tgv_writeGifFrame(fig, 0.1, t == 1, options); % GIF-Frame schreiben
         end
-
-        elapsedTime = toc;
-        disp(['Berechnungszeit: ', num2str(elapsedTime), ' Sekunden']);
+        elapsedTime = toc; % Berechnungszeit für Zeitschritt speichern
+        disp(['Berechnungszeit: ', num2str(elapsedTime), ' Sekunden']); % Berechnungszeit ausgeben
     end
 
     if isvalid(fig)
