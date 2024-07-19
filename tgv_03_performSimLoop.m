@@ -4,10 +4,11 @@ function tgv_03_performSimLoop(X, Y, U_a, V_a, Psi_a, B, W, options)
     time = linspace(0, options.t_end, options.t_nr); % Zeitvektor erstellen
 
     % Partikelpositionen initialisieren
-    X_pos = X; Y_pos = Y; X_pos_a = X; Y_pos_a = Y;
+    X_pos = X;   Y_pos = Y;   X_pos_a = X;   Y_pos_a = Y;
 
     % Erstellen der Ableitungsmatrizen D1x, D1y, D2x und D2y
-    [D1x, D1y, D2x, D2y] = tgv_createDiffMatrices(options);
+    [D1x, D1y] = tgv_createNabla(options);
+    [D2x, D2y] = tgv_createLaplace(options);
 
     % Aufstellen und Zerlegen der Systemmatrix für die Poisson-Gleichung
     A = diag(~B(:)) * (D2x + D2y) + diag(B(:)); % ∇² = ∂²/∂x² + ∂²/∂y²
@@ -23,6 +24,7 @@ function tgv_03_performSimLoop(X, Y, U_a, V_a, Psi_a, B, W, options)
     fig = figure; % Figure für die Animation erstellen
     if options.writeGif
     set(fig, 'Visible', 'off'); % Figure unsichtbar machen;
+    isFirstFrame = true; % Erster Frame für GIF-Datei
     end
 
     for t = time
@@ -68,7 +70,8 @@ function tgv_03_performSimLoop(X, Y, U_a, V_a, Psi_a, B, W, options)
 
         drawnow; % Figure aktualisieren
         if options.writeGif
-        tgv_writeGifFrame(fig, 0.1, t == 1, options); % GIF-Frame schreiben
+        tgv_writeGifFrame(fig, 0.1, isFirstFrame, options); % GIF-Frame schreiben
+        isFirstFrame = false; % Erster Frame ist geschrieben
         end
         elapsedTime = toc; % Berechnungszeit für Zeitschritt speichern
         disp(['Berechnungszeit: ', num2str(elapsedTime), ' Sekunden']); % Berechnungszeit ausgeben

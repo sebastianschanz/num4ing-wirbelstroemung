@@ -18,7 +18,7 @@ function Omega = tgv_updateVorticity(U, V, Omega, Psi, D1x, D1y, D2x, D2y, W, op
     omega = omega + options.dt * (diffusion - convection) * omega_W;
 
     % Rücktransformation in Matrixform
-    Omega = reshape(omega, [options.x_nr, options.y_nr]);
+    Omega = reshape(omega, [options.nx, options.ny]);
 end
 
 % Wirbelstärke (ω): Maß für die lokale Rotation in der Strömung. 

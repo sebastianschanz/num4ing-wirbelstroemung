@@ -10,6 +10,6 @@ function [U, V] = tgv_updateVelocity(Psi, D1x, D1y, U, V, W, options)
     v = ~W(:) .* (-D1x * psi) + W(:) .* v; % v = -∂ψ/∂x
 
     % Rücktransformation in Matrixform
-    U = reshape(u, [options.x_nr, options.y_nr]);
-    V = reshape(v, [options.x_nr, options.y_nr]);
+    U = reshape(u, [options.nx, options.ny]);
+    V = reshape(v, [options.nx, options.ny]);
 end
