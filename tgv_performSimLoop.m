@@ -1,11 +1,10 @@
-function tgv_performSimLoop(options)
+function tgv_performSimLoop(data, options)
     % Funktion zur Ausführung der Aktualisierungsschleife der Taylor-Green-Wirbel-Simulation
     time = linspace(0, options.t_end, options.t_nr); % Zeitvektor erstellen
 
-    [data] = tgv_initSimulation(options);  % Simulationsvariablen initialisieren
     X = data.X; Y = data.Y; X_pos = data.X_pos; Y_pos = data.Y_pos; X_pos_a = data.X_pos_a; Y_pos_a = data.Y_pos_a;
     D1x = data.D1x; D1y = data.D1y; D2x = data.D2x; D2y = data.D2y; B = data.B; W = data.W; A_L = data.A_L; A_U = data.A_U;
-    traj_X_pos = data.traj_X_pos; traj_Y_pos = data.traj_Y_pos; traj_X_pos_a = data.traj_X_pos_a; traj_Y_pos_a = data.traj_Y_pos_a;
+    traj_X_pos = data.traj_X_pos; traj_Y_pos = data.traj_Y_pos; traj_X_pos_a = data.traj_X_pos_a; traj_Y_pos_a = data.traj_Y_pos_a; particleIndices = data.particleIndices;
     U = data.U; V = data.V; Psi = data.Psi; Omega = data.Omega; U_a = data.U_a; V_a = data.V_a; Psi_a = data.Psi_a; colors = data.colors;
 
     % Figure für die Animation erstellen
@@ -52,19 +51,24 @@ function tgv_performSimLoop(options)
         Y_pos = tgv_applyBC(Y_pos, 'periodic');
 
         % Analytische und Numerische Lösung plotten
-        tgv_plotParticleField(subplot(3 - ~options.calcErrors, 2, 1, 'Parent', fig), X_pos, Y_pos, colors, 'Partikelplot (Numerisch)', 'x', 'y', options);
         tgv_plotStreamFunction(subplot(3 - ~options.calcErrors, 2, 2, 'Parent', fig), X, Y, Psi, 'Stromfkt. $\Psi_n$ (Numerisch)', 'x', 'y', '$\Psi_n$', options);
-        tgv_plotParticleField(subplot(3 - ~options.calcErrors, 2, 3, 'Parent', fig), X_pos_a, Y_pos_a, colors, 'Partikelplot (Analytisch)', 'x', 'y', options);
         tgv_plotStreamFunction(subplot(3 - ~options.calcErrors, 2, 4, 'Parent', fig), X, Y, Psi_a_now, 'Stromfkt. $\Psi_a$ (Analytisch)', 'x', 'y', '$\Psi_a$', options);
-        
-        if options.showTraj && options.calcErrors
-            % Bahnlinie des ausgewählten Partikels aktualisieren
-            traj_X_pos = [traj_X_pos, X_pos(options.particleIdx)];          % X-Position des ausgewählten Partikels hinzufügen
-            traj_Y_pos = [traj_Y_pos, Y_pos(options.particleIdx)];          % Y-Position des ausgewählten Partikels hinzufügen
-            traj_X_pos_a = [traj_X_pos_a, X_pos_a(options.particleIdx)];    % X-Position des ausgewählten Partikels hinzufügen
-            traj_Y_pos_a = [traj_Y_pos_a, Y_pos_a(options.particleIdx)];    % Y-Position des ausgewählten Partikels hinzufügen
-            tgv_plotTrajectory(subplot(3, 2, 1, 'Parent', fig), traj_X_pos, traj_Y_pos,X_pos(options.particleIdx), Y_pos(options.particleIdx));
-            tgv_plotTrajectory(subplot(3, 2, 3, 'Parent', fig), traj_X_pos_a, traj_Y_pos_a, X_pos_a(options.particleIdx), Y_pos_a(options.particleIdx));
+
+        if options.showTraj
+            % Bahnlinien der ausgewählten Partikel aktualisieren
+            for j = 1:options.numParticles
+                idx = particleIndices(j);
+                traj_X_pos{j} = [traj_X_pos{j}, X_pos(idx)];
+                traj_Y_pos{j} = [traj_Y_pos{j}, Y_pos(idx)];
+                traj_X_pos_a{j} = [traj_X_pos_a{j}, X_pos_a(idx)];
+                traj_Y_pos_a{j} = [traj_Y_pos_a{j}, Y_pos_a(idx)];
+            end
+            % Plotten der Trajektorien auf die leeren Felder
+            tgv_plotTrajectory(subplot(3 - ~options.calcErrors, 2, 1, 'Parent', fig), traj_X_pos, traj_Y_pos, 'Bahnlinienfeld (Numerisch)', 'x', 'y', options);
+            tgv_plotTrajectory(subplot(3 - ~options.calcErrors, 2, 3, 'Parent', fig), traj_X_pos_a, traj_Y_pos_a, 'Bahnlinienfeld (Analytisch)', 'x', 'y', options);
+        else
+            tgv_plotParticleField(subplot(3 - ~options.calcErrors, 2, 1, 'Parent', fig), X_pos, Y_pos, colors, 'Lagrange-Part. (Numerisch)', 'x', 'y', options);
+            tgv_plotParticleField(subplot(3 - ~options.calcErrors, 2, 3, 'Parent', fig), X_pos_a, Y_pos_a, colors, 'Lagrange-Part. (Analytisch)', 'x', 'y', options);
         end 
 
         if options.calcErrors
@@ -100,5 +104,9 @@ function tgv_performSimLoop(options)
 
     if isvalid(fig)
         close(fig);
+    end
+
+    if options.writeGif
+        close(hWaitbar); % Fortschrittsanzeige schließen
     end
 end

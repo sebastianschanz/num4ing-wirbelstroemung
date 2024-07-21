@@ -8,8 +8,16 @@ function [data] = tgv_initSimulation(options)
     % Partikelpositionen initialisieren
     data.X_pos = X;   data.Y_pos = Y;   data.X_pos_a = X;   data.Y_pos_a = Y;
 
-    % Initialisierung der Bahnlinie eines Partikels
-    data.traj_X_pos = [];   data.traj_Y_pos = [];  data.traj_X_pos_a = [];   data.traj_Y_pos_a = [];
+    % Zufällige Auswahl der Partikel für das Plotten der Bahnlinien
+    numParticles = options.numParticles;
+    totalParticles = numel(data.X_pos);
+    data.particleIndices = randperm(totalParticles, numParticles);
+    
+    % Arrays zur Speicherung der Bahnlinien mehrerer Partikel
+    data.traj_X_pos = cell(numParticles, 1);
+    data.traj_Y_pos = cell(numParticles, 1);
+    data.traj_X_pos_a = cell(numParticles, 1);
+    data.traj_Y_pos_a = cell(numParticles, 1);
 
     % Erstellen der Ableitungsmatrizen D1x, D1y, D2x und D2y
     [D1x, D1y] = tgv_createNabla(options);
