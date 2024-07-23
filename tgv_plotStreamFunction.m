@@ -2,13 +2,15 @@ function tgv_plotStreamFunction(ax, X, Y, Psi, titleText, xlabelText, ylabelText
     % Plot Funktion für die Stromfunktion
     cla(ax); % Aktuellen Plot in der angegebenen Achse löschen
     surf(ax, X, Y, Psi, 'EdgeColor', 'none'); % Oberflächenplot erstellen
-    set(ax, 'Color', 'none'); % Hintergrund entfernen
-    view(ax, 3); % 3D-Ansicht für Oberflächenplots setzen
-    
-    title(ax, titleText, 'Interpreter', 'latex', 'FontSize', 12); % Titel setzen
+    title(ax, titleText, 'Interpreter', 'latex'); % Titel setzen
     xlabel(ax, xlabelText, 'Interpreter', 'latex'); % X-Achsenbeschriftung
     ylabel(ax, ylabelText, 'Interpreter', 'latex'); % Y-Achsenbeschriftung
     zlabel(ax, zlabelText, 'Interpreter', 'latex'); % Z-Achsenbeschriftung
+    axis(ax, 'square'); % Achsenverhältnis beibehalten
+    set(ax, 'Color', 'none'); % Hintergrund entfernen
+    set(ax, 'FontSize', options.imgScale*options.fontSize);
+    set(get(ax, 'Title'), 'FontSize', options.imgScale*(options.fontSize+2));
+    view(ax, 3); % 3D-Ansicht für Oberflächenplots setzen
 
     % Colormap setzen
     if exist('colorScheme', 'var') && ~isempty(colorScheme)

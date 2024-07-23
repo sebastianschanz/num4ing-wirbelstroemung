@@ -1,37 +1,34 @@
-function pos_err_std = tgv_plotErrors(ax, pos_err_abs, t, titleText, ylabelText, options)
-    if t == 0
-        t = 0.01;
-    end
+function pos_err_std = tgv_plotErrors(ax, pos_err_abs, titleText, options)
+    % Function to create a box plot of absolute position errors
 
-    color = [1,0.2,0]; % Farbe für den Boxplot
-    % Diese Funktion plottet die Fehler der Partikelpositionen in einem horizontalen Boxchart
-    cla(ax); % Aktuellen Plot löschen
-    pos_err_abs = pos_err_abs(:); % Fehlervektor in Spaltenvektor umwandeln
+    color = [1, 0.2, 0]; % Color for the box plot
+    % This function plots the particle position errors in a horizontal box chart
+    cla(ax); % Clear current plot
+
+    % Calculate error values
+    pos_err_abs = pos_err_abs(:); % Convert error vector to column vector
+    pos_err_std = std(pos_err_abs); % Standard deviation of error values
+    pos_err_median = median(pos_err_abs); % Median of error values
     
-    % Berechne das 99. Perzentil
-    quantile_crop = quantile(pos_err_abs, 0.92);
-    
-    % Filtere die Fehlerwerte, die unter dem 92. Perzentil liegen
-    pos_err_abs_cropped = pos_err_abs(pos_err_abs <= quantile_crop);
-    
-    % Berechne die Standardabweichung der gefilterten Fehlerwerte
-    pos_err_std = std(pos_err_abs_cropped);
-    
-    % Erstelle den Boxplot
-    boxchart(ax, pos_err_abs, 'Orientation', 'vertical', 'BoxFaceColor', color, 'MarkerColor', color, 'MarkerSize', 5); % Boxplot in roter Farbe plotten    
-    title(ax, titleText, 'Interpreter', 'latex', 'FontSize', 12); % Titel setzen
-    ylim(ax, [0, options.nu*t]); % x-Achse auf 0 bis 0.03 beschränken
-    ylabel(ax, ylabelText, 'Interpreter', 'latex', 'FontSize', 10); % x-Achsenbeschriftung setzen
-    % wissenschaftliche Zehnerpotenz für die y-Achse
-    ax.YAxis.Exponent = 0;
-    % immer 3 Nachkommstellen
-    ax.YAxis.TickLabelFormat = '%.3f';
-    % immer 3 Ticks auf der y-Achse
-    ax.YAxis.TickValues = linspace(0, options.nu*t, options.nticks+2);
-    % Entferne die y-Achse und den Hintergrund
-    set(ax, 'xtick', []); % y-Achsenticks entfernen
-    set(ax, 'xticklabel', []); % y-Achsenbeschriftungen entfernen
-    set(ax, 'XColor', 'none'); % y-Achsenlinie entfernen
-    set(ax, 'Color', 'none'); % Hintergrund entfernen
-    ylabel(ax, ''); % y-Achsenlabel entfernen
+    % Create the box plot
+    boxchart(ax, pos_err_abs, 'Orientation', 'horizontal', 'BoxFaceColor', color, 'MarkerColor', color, 'MarkerSize', options.imgScale * 4); % Plot box plot in red color
+    title(ax, titleText, 'Interpreter', 'latex'); % Set title
+    xlim(ax, [0, 0.9]); % Limit x-axis from 0 to the specified value
+    xticks(ax, linspace(0, 0.9, options.nticks+1));
+    ax.XAxis.TickLabelFormat = '%.1f'; % Set x-axis tick label format
+    ax.XAxis.Exponent = 0; % Set x-axis exponent to 0
+    set(ax, 'ytick', []); % Remove y-axis ticks
+    set(ax, 'yticklabel', []); % Remove y-axis labels
+    set(ax, 'YColor', 'none'); % Remove y-axis line
+    set(ax, 'Color', 'none'); % Remove background
+    set(ax, 'FontSize', options.imgScale * options.fontSize); % Set font size
+    set(get(ax, 'Title'), 'FontSize', options.imgScale * (options.fontSize + 2)); % Set title font size
+    axis(ax, 'square'); % Achsenverhältnis beibehalten
+
+    % Add an annotation at the median line
+    hold(ax, 'on');
+    text(ax, pos_err_median, 1.3 + max(pos_err_abs)/50, sprintf('$Med$ %.3f', pos_err_median), ...
+        'VerticalAlignment', 'bottom', 'HorizontalAlignment', 'center', ...
+        'Interpreter', 'latex', 'FontSize', options.imgScale * options.fontSize);
+    hold(ax, 'off');
 end

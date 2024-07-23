@@ -1,4 +1,4 @@
-function [data] = tgv_initSimulation(options)
+function data = tgv_initSimulation(options)
     % Initialisierung der Simulationsvariablen für den Taylor-Green-Wirbel
     x = linspace(options.x_min, options.x_max, options.nx);
     y = linspace(options.y_min, options.y_max, options.ny);
@@ -57,4 +57,14 @@ function [data] = tgv_initSimulation(options)
 
     colors = tgv_initColors(Y, options); % Farben für die Partikel initialisieren
     data.colors = colors;
+
+    % Figure Parameter berechnen
+    figWidth = options.imgScale*options.imgHeight*(0.5*options.calcErrors + 1); % Breite der Figure
+    figHeight = options.imgScale*options.imgWidth; % Höhe der Figure
+    screenSize = get(0, 'ScreenSize'); % Bildschirmgröße
+    figPosX = (screenSize(3) - figWidth) / 2; % Position der Figure in x-Richtung
+    figPosY = (screenSize(4) - figHeight) / 2; % Position der Figure in y-Richtung
+    fig = figure('Units', 'pixels', 'Position', [figPosX, figPosY, figWidth, figHeight]); % Figure erstellen
+    set(fig, 'Resize', 'off');
+    data.fig = fig;
 end

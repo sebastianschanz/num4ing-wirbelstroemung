@@ -1,12 +1,14 @@
 function tgv_plotParticleField(ax, X_pos, Y_pos, colors, titleText, xlabelText, ylabelText, options, colorScheme, xRange, yRange)
     % Plot Funktion für das Partikelfeld
     cla(ax); % Aktuellen Plot in der angegebenen Achse löschen
-    scatter(ax, X_pos(:), Y_pos(:), [], colors, 'filled'); % Scatter-Plot mit Farben erstellen
-
-    title(ax, titleText, 'Interpreter', 'latex', 'FontSize', 12); % Titel setzen
+    scatter(ax, X_pos(:), Y_pos(:), options.imgScale*20, colors, 'filled'); % Scatter-Plot mit Farben erstellen
+    title(ax, titleText, 'Interpreter', 'latex'); % Titel setzen
     xlabel(ax, xlabelText, 'Interpreter', 'latex'); % X-Achsenbeschriftung
     ylabel(ax, ylabelText, 'Interpreter', 'latex'); % Y-Achsenbeschriftung
+    axis(ax, 'square'); % Achsenverhältnis beibehalten andere Optionen sind
     set(ax, 'Color', 'none'); % Hintergrund entfernen
+    set(ax, 'FontSize', options.imgScale*options.fontSize);
+    set(get(ax, 'Title'), 'FontSize', options.imgScale*(options.fontSize+2));
 
     % Colormap setzen
     if exist('colorScheme', 'var') && ~isempty(colorScheme)

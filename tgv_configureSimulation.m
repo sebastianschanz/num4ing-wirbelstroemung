@@ -1,6 +1,6 @@
 function options = tgv_configureSimulation()
     % Funktion zur Konfiguration der Simulationsparameter
-    options.nu = 0.09; % Kinematische Viskosität
+    options.nu = 0.05; % Kinematische Viskosität
     options.nx = 50; % Anzahl der Gitterpunkte in x-Richtung
     options.ny = 50; % Anzahl der Gitterpunkte in y-Richtung
 
@@ -17,16 +17,21 @@ function options = tgv_configureSimulation()
     options.dy = (options.y_max - options.y_min) / (options.nx - 1);
 
     % Endzeit, Anzahl der Zeitschritte und Zeitschrittweite
-    options.t_end = 10;
-    options.t_nr = 200;
+    options.t_end = 8;
+    options.t_nr = options.t_end*20;
     options.dt = options.t_end / options.t_nr;
+    options.method = 'expliziter-euler';    % Integrationsmethode
  
-    options.method = 'expliziter-euler'; % Integrationsmethode
-    options.writeGif = true;            % GIF-Datei schreiben
-    options.calcErrors = true;  % Fehlerberechnung aktivieren
-    options.showTraj = false;    % Bahnlinie eines Partikels anzeigen
-    options.numParticles = 40; % Startindex für die Partikel
-    options.colormap = 'parula';         % Farbkarte für die Darstellung
-    options.nticks = 3;                  % Anzahl der Ticks auf Achsen
-    options.filename = '.\simulation_lagrange_errors_nu_0.09.gif'; % Dateiname für die GIF-Datei
+    options.calcErrors = false;              % Fehlerberechnung aktivieren
+    options.showTraj = true;               % Bahnlinie eines Partikels anzeigen
+    options.numParticles = 15;             % Startindex für die Partikel
+    
+    options.writeGif = true;                % GIF-Datei schreib
+    options.colormap = 'parula';            % Farbkarte für die Darstellung
+    options.nticks = 3;                     % Anzahl der Ticks auf Achsenen
+    options.imgWidth = 400;                 % Bildbreite
+    options.imgHeight = options.imgWidth;   % Bildhöhe
+    options.fontSize = 8;                   % Grund-Schriftgröße
+    options.imgScale = 1.8;                 % 1-1.8, Skalierungsfaktor für Bildauflösung, hochschrauben für schönere Gifs
+    options.filename = '.\simulation_trajectories_15_nu_0.05.gif'; % Dateiname für die GIF-Datei
 end
