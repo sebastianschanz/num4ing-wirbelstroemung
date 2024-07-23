@@ -14,7 +14,4 @@ function main()
     tgv_performSimLoop(data, options);  % Aktualisierungsschleife ausführen
 end
 
-main();
-
-% Nächste Schritte:
-% Numerische Verfahren: Sobald die Berechnung des Taylor-Green-Wirbels korrekt ist, können verschiedene numerische Verfahren getestet werden. Dies könnte durch die Implementierung verschiedener Diskretisierungs- und Zeitschrittverfahren erfolgen (z.B. expliziter Euler, Runge-Kutta, Adams-Bashforth).
+main();  % Hauptfunktion ausführen
