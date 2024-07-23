@@ -1,5 +1,5 @@
 %%% Projekt Wirbelströmung %%%
-%%% TAYLOR-GREEN-VORTEX %%%
+%%% TAYLOR-GREEN-WIRBEL %%%
 
 %%% Gruppe nm Y
 %%% Fabian Schmitt 492849, 
