@@ -35,8 +35,6 @@ function tgv_performSimLoop(data, options)
 
         % 4. Partikelpositionen aktualisieren
         [X_pos, Y_pos] = tgv_updatePosition(X_pos, Y_pos, U, V, X, Y, options);
-        %X_pos = tgv_applyBC(X_pos, 'periodic');
-        %Y_pos = tgv_applyBC(Y_pos, 'periodic');
 
         % Analytische und Numerische Lösung plotten
         tgv_plotStreamFunction(subplot(2, 3- ~options.calcErrors, 4 - ~options.calcErrors, 'Parent', fig), X, Y, Psi, 'Stromfunktion $\Psi_n$ (num.)', 'x', 'y', '$\Psi_n$', options);
