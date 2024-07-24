@@ -18,20 +18,20 @@ function options = tgv_configureSimulation()
 
     % Endzeit, Anzahl der Zeitschritte und Zeitschrittweite
     options.t_end = 8;
-    options.t_nr = options.t_end*20;
+    options.t_nr = options.t_end*20+1;
     options.dt = options.t_end / options.t_nr;
     options.method = 'expliziter-euler';    % Integrationsmethode
  
     options.calcErrors = false;             % Fehlerberechnung aktivieren
     options.showTraj = false;               % Bahnlinie eines Partikels anzeigen
-    options.numParticles = 15;              % Startindex für die Partikel
+    options.numParticles = 12;              % Startindex für die Partikel
     
-    options.writeGif = false;               % GIF-Datei schreib
+    options.writeGif = false;               % GIF-Datei schreiben
     options.colormap = 'parula';            % Farbkarte für die Darstellung
     options.nticks = 3;                     % Anzahl der Ticks auf Achsenen
     options.imgWidth = 400;                 % Bildbreite
     options.imgHeight = options.imgWidth;   % Bildhöhe
     options.fontSize = 8;                   % Grund-Schriftgröße
     options.imgScale = 1;                   % 1-1.8, Skalierungsfaktor für Bildauflösung, hochschrauben für schönere Gifs
-    options.filename = '.\simulation_trajectories_15_nu_0.05.gif'; % Dateiname für die GIF-Datei
+    options.filename = '.\simulation_trajectories_12_nu_0.05.gif'; % Dateiname für die GIF-Datei
 end
