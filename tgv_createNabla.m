@@ -9,9 +9,9 @@ function [D1x, D1y] = tgv_createNabla(options)
     N = nx * ny; % Gesamtanzahl der Gitterpunkte
 
     % Speicherreservierung für die Differenzenmatrizen
-    % Erstellt dünnbesetzte Matrizen D1x, D1y der Größe N x N mit 3 * N Elementen
-    D1x = spalloc(N, N, 3 * N);
-    D1y = spalloc(N, N, 3 * N);
+    % Erstellt dünnbesetzte Matrizen D1x, D1y der Größe N x N mit 2 * N Elementen
+    D1x = spalloc(N, N, 2 * N);
+    D1y = spalloc(N, N, 2 * N);
 
     % Indizes für zentrale Differenzen
     e = ones(N, 1);

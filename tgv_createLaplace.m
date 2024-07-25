@@ -9,9 +9,9 @@ function [D2x, D2y] = tgv_createLaplace(options)
     N = nx * ny; % Gesamtanzahl der Gitterpunkte
 
     % Speicherreservierung für die Differenzenmatrizen
-    % Erstellt dünnbesetzte Matrizen D2x, D2y der Größe N x N mit 5 * N Elementen
-    D2x = spalloc(N, N, 5 * N);
-    D2y = spalloc(N, N, 5 * N);
+    % Erstellt dünnbesetzte Matrizen D2x, D2y der Größe N x N mit 3 * N Elementen
+    D2x = spalloc(N, N, 3 * N);
+    D2y = spalloc(N, N, 3 * N);
 
     % Indizes für zentrale Differenzen
     e = ones(N, 1);
