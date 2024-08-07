@@ -6,7 +6,7 @@ function tgv_performSimLoop(data, options)
     D1x = data.D1x; D1y = data.D1y; D2x = data.D2x; D2y = data.D2y; B = data.B; W = data.W; A_L = data.A_L; A_U = data.A_U;
     traj_X_pos = data.traj_X_pos; traj_Y_pos = data.traj_Y_pos; traj_X_pos_a = data.traj_X_pos_a; traj_Y_pos_a = data.traj_Y_pos_a; particleIndices = data.particleIndices;
     U = data.U; V = data.V; Psi = data.Psi; Omega = data.Omega; U_a = data.U_a; V_a = data.V_a; Psi_a = data.Psi_a; colors = data.colors;
-    fig = data.fig;
+    fig = data.fig; WH = data.WH; WV = data.WV;
 
     for i = 1:length(time)
         if ~isvalid(fig) % Prüfen, ob die Figure noch existiert
@@ -28,7 +28,7 @@ function tgv_performSimLoop(data, options)
         Psi = tgv_updateStream(Omega, A_L, A_U, Psi, B);
 
         % 2. Geschwindigkeitsfeld U und V aktualisieren
-        [U, V] = tgv_updateVelocity(Psi, D1x, D1y, U, V, W, options);
+        [U, V] = tgv_updateVelocity(Psi, D1x, D1y, U, V, W, options, WH, WV);
 
         % 3. Wirbelstärke ω aktualisieren
         Omega = tgv_updateVorticity(U, V, Omega, Psi, D1x, D1y, D2x, D2y, W, options);

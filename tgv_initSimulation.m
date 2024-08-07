@@ -36,6 +36,16 @@ function data = tgv_initSimulation(options)
     W = B;
     data.W = W;
 
+    WH = false(options.nx, options.ny);
+    WH(1, :) = true;     % Untere Wand
+    WH(end, :) = true;   % Obere Wand
+    data.WH = WH;
+
+    WV = false(options.nx, options.ny);
+    WV(:, 1) = true;     % Linke Wand
+    WV(:, end) = true;   % Rechte Wand
+    data.WV = WV;
+
     % Aufstellen und Zerlegen der Systemmatrix für die Poisson-Gleichung
     A = diag(~B(:)) * (D2x + D2y) + diag(B(:)); % ∇² = ∂²/∂x² + ∂²/∂y²
     [A_L, A_U] = lu(A);                         % LU-Zerlegung der Systemmatrix
