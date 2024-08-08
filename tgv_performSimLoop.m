@@ -81,23 +81,23 @@ function tgv_performSimLoop(data, options)
 
         % Aktualisierung der Strömungsgrößen für den nächsten Zeitschritt
         [Psi_n_next, U_n_next, V_n_next, Omega_dot_n_next] = tgv_updateVariables(Omega_n_now, Psi_n_now, U_n_now, V_n_now, D1x, D1y, D2x, D2y, WH, WV, A_L, A_U, B, options);
+        Omega_n_next = Omega_n_now + dt * Omega_dot_n_now;
+        X_n_next = X_n_now + dt * interp2(X, Y, U_n_now, X_n_now, Y_n_now, 'linear', 0);
+        Y_n_next = Y_n_now + dt * interp2(X, Y, V_n_now, X_n_now, Y_n_now, 'linear', 0);
+        X_a_next = X_a_now + dt * interp2(X, Y, U_a_now, X_a_now, Y_a_now, 'linear', 0);
+        Y_a_next = Y_a_now + dt * interp2(X, Y, V_a_now, X_a_now, Y_a_now, 'linear', 0);
 
         % Zeitschrittverfahren für die numerische Lösung
         if strcmp(options.stepMethod, 'explicitEuler')
-            Omega_n_next = Omega_n_now + dt * Omega_dot_n_now;
-            X_n_next = X_n_now + dt * interp2(X, Y, U_n_now, X_n_now, Y_n_now, 'linear', 0);
-            Y_n_next = Y_n_now + dt * interp2(X, Y, V_n_now, X_n_now, Y_n_now, 'linear', 0);
+        elseif strcmp(options.stepMethod, 'implicitEuler')
+            Omega_n_next = Omega_n_now + dt * Omega_dot_n_next;
+            X_n_next = X_n_now + dt * interp2(X, Y, U_n_next, X_n_next, Y_n_next, 'linear', 0);
+            Y_n_next = Y_n_now + dt * interp2(X, Y, V_n_next, X_n_next, Y_n_next, 'linear', 0);
         elseif strcmp(options.stepMethod, 'trapezoid')
             Omega_n_next = Omega_n_now + dt * 0.5 * (Omega_dot_n_now + Omega_dot_n_next);
-            X_n_next = X_n_now + dt * interp2(X, Y, U_n_now, X_n_now, Y_n_now, 'linear', 0);
-            Y_n_next = Y_n_now + dt * interp2(X, Y, V_n_now, X_n_now, Y_n_now, 'linear', 0);
             X_n_next = X_n_now + dt * 0.5 * (interp2(X, Y, U_n_now, X_n_now, Y_n_now, 'linear', 0) + interp2(X, Y, U_n_next, X_n_next, Y_n_next, 'linear', 0));
             Y_n_next = Y_n_now + dt * 0.5 * (interp2(X, Y, V_n_now, X_n_now, Y_n_now, 'linear', 0) + interp2(X, Y, V_n_next, X_n_next, Y_n_next, 'linear', 0));
         end
-
-        % Zeitschrittverfahren für die analytische Lösung
-        X_a_next = X_a_now + dt * interp2(X, Y, U_a_now, X_a_now, Y_a_now, 'linear', 0);
-        Y_a_next = Y_a_now + dt * interp2(X, Y, V_a_now, X_a_now, Y_a_now, 'linear', 0);
 
         % Titel für die Figure aktualisieren
         sgtitle(['Taylor-Green-Wirbel mit ', '$\nu=', num2str(options.nu), ',~t=', num2str(t, '%.2f'), '$'], 'Interpreter', 'latex', 'FontSize', options.imgScale*(options.fontSize+5));
