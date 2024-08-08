@@ -8,6 +8,8 @@ function [U, V] = tgv_solveCauchy(Psi, D1x, D1y, U, V, WH, WV, options)
     % Geschwindigkeiten U und V aus Psi
     u = ~WV(:) .* (D1y * psi) + WV(:) .* u; % u = ∂ψ/∂y
     v = ~WH(:) .* (-D1x * psi) + WH(:) .* v; % v = -∂ψ/∂x
+    u = ~WV(:) .* (D1y * psi) + WV(:) .* u; % u = ∂ψ/∂y
+    v = ~WH(:) .* (-D1x * psi) + WH(:) .* v; % v = -∂ψ/∂x
 
     % Rücktransformation in Matrixform
     U = reshape(u, [options.nx, options.ny]);
