@@ -1,4 +1,4 @@
-function [U, V] = tgv_updateVelocity(Psi, D1x, D1y, U, V, W, options)
+function [U, V] = tgv_solveCauchy(Psi, D1x, D1y, U, V, WH, WV, options)
     % Umrechnung der Stromfunktion Ψ in die einzelnen Geschwindigkeitskomponenten 
     % u und v anhand der Cauchy-Riemann-Gleichungen.
 
@@ -6,8 +6,8 @@ function [U, V] = tgv_updateVelocity(Psi, D1x, D1y, U, V, W, options)
     psi = Psi(:); u = U(:); v = V(:);
 
     % Geschwindigkeiten U und V aus Psi
-    u = ~W(:) .* (D1y * psi) + W(:) .* u; % u = ∂ψ/∂y
-    v = ~W(:) .* (-D1x * psi) + W(:) .* v; % v = -∂ψ/∂x
+    u = ~WV(:) .* (D1y * psi) + WV(:) .* u; % u = ∂ψ/∂y
+    v = ~WH(:) .* (-D1x * psi) + WH(:) .* v; % v = -∂ψ/∂x
 
     % Rücktransformation in Matrixform
     U = reshape(u, [options.nx, options.ny]);

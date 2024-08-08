@@ -1,4 +1,4 @@
-function Psi = tgv_updateStream(Omega, A_L, A_U, Psi, B)
+function Psi = tgv_solvePoisson(Omega, A_L, A_U, Psi, B)
     % Lösung der Poisson-Gleichung für die Stromfunktion Ψ 
     % mit der vorgegebenen Verteilung der Wirbelstärke ω.
 

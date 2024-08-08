@@ -5,19 +5,19 @@ function data = tgv_initSimulation(options)
     [X, Y] = meshgrid(x, y);
     data.X = X;   data.Y = Y;
 
-    % Partikelpositionen initialisieren
-    data.X_pos = X;   data.Y_pos = Y;   data.X_pos_a = X;   data.Y_pos_a = Y;
-
     % Zufällige Auswahl der Partikel für das Plotten der Bahnlinien
     numParticles = options.numParticles;
-    totalParticles = numel(data.X_pos);
-    data.particleIndices = randperm(totalParticles, numParticles);
+    totalParticles = numel(X);
+    data.particleIdx = randperm(totalParticles, numParticles);
     
     % Arrays zur Speicherung der Bahnlinien mehrerer Partikel
-    data.traj_X_pos = cell(numParticles, 1);
-    data.traj_Y_pos = cell(numParticles, 1);
-    data.traj_X_pos_a = cell(numParticles, 1);
-    data.traj_Y_pos_a = cell(numParticles, 1);
+    data.X_n_trail = cell(numParticles, 1);
+    data.Y_n_trail = cell(numParticles, 1);
+    data.X_a_trail = cell(numParticles, 1);
+    data.Y_a_trail = cell(numParticles, 1);
+    % Arrays zur Speicherung der Enstrophie
+    data.E_kin_n = zeros(1, options.t_nr);
+    data.E_kin_a = zeros(1, options.t_nr);
 
     % Erstellen der Ableitungsmatrizen D1x, D1y, D2x und D2y
     [D1x, D1y] = tgv_createNabla(options);
@@ -33,8 +33,15 @@ function data = tgv_initSimulation(options)
     data.B = B;
 
     % Definition des Boolschen Vektors für die Cauchy-Riemann Gleichung
-    W = B;
-    data.W = W;
+    WH = false(options.nx, options.ny);
+    WH(1, :) = true;     % Untere Wand
+    WH(end, :) = true;   % Obere Wand
+    data.WH = WH;
+
+    WV = false(options.nx, options.ny);
+    WV(:, 1) = true;     % Linke Wand
+    WV(:, end) = true;   % Rechte Wand
+    data.WV = WV;
 
     % Aufstellen und Zerlegen der Systemmatrix für die Poisson-Gleichung
     A = diag(~B(:)) * (D2x + D2y) + diag(B(:)); % ∇² = ∂²/∂x² + ∂²/∂y²
@@ -46,15 +53,7 @@ function data = tgv_initSimulation(options)
     V_a = @(t) -cos(X) .* sin(Y) .* exp(-2 * options.nu * t);   % Analytische Geschwindigkeitskomponente V
     Psi_a = @(t) sin(X) .* sin(Y) .* exp(-2 * options.nu * t);  % Analytische Stromfunktion
     data.U_a = U_a;   data.V_a = V_a;   data.Psi_a = Psi_a;
-
-    % Numerische Lösung mit analytischer vorinitialisieren
-    U = U_a(0);                                 % U = sin(X) .* cos(Y) * F_t
-    V = V_a(0);                                 % V = -cos(X) .* sin(Y) * F_t
-    Psi = Psi_a(0);                             % ψ = sin(X) .* sin(Y) * F_t
-    Omega_vec = -(D2x * Psi(:) + D2y * Psi(:)); % ω = -∇²ψ  
-    Omega = reshape(Omega_vec, size(X));        % in Matrix umwandeln
-    data.U = U;   data.V = V;   data.Psi = Psi;   data.Omega = Omega;
-
+    
     colors = tgv_initColors(Y, options); % Farben für die Partikel initialisieren
     data.colors = colors;
 

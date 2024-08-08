@@ -1,12 +1,12 @@
-function [pos_err_abs, Psi_err, Psi_mse_err] = tgv_calcErrors(X_pos, Y_pos, X_pos_a, Y_pos_a, Psi, Psi_a_now)
-    % Calculates the absolute positional errors between analytical and numerical solution 
-    % as well as the standard devation for boxplotting and the error of the respective stream functions
+function [pos_err_abs, Psi_err, Psi_mse_err] = tgv_calcErrors(X_n, Y_n, X_a, Y_a, Psi_n_now, Psi_a_now)
+    % Berechnet den absoluten Fehler der Partikelpositionen, den Fehler der Stromfunktionen und die Enstrophie
 
-    pos_err_x = X_pos - X_pos_a;
-    pos_err_y = Y_pos - Y_pos_a;
-    pos_err_abs = sqrt(pos_err_x.^2 + pos_err_y.^2); % Absolute Fehler der Partikelpositionen berechnen
+    % Absolute Fehler der Partikelpositionen berechnen
+    pos_err_x = X_n - X_a;
+    pos_err_y = Y_n - Y_a;
+    pos_err_abs = sqrt(pos_err_x.^2 + pos_err_y.^2);
 
-    % Calculate the error of stream functions
-    Psi_err = Psi - Psi_a_now;
+    % Summe der Fehlerquadrate der Stromfunktion berechnen
+    Psi_err = Psi_n_now - Psi_a_now;
     Psi_mse_err = mean(Psi_err(:).^2);
 end

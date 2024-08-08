@@ -1,4 +1,4 @@
-function Omega = tgv_updateVorticity(U, V, Omega, Psi, D1x, D1y, D2x, D2y, W, options)
+function Omega_dot = tgv_solveVorticity(U, V, Psi, Omega, D1x, D1y, D2x, D2y, B, options)
     % Berechnung der Wirbelstärke ω zum nächsten Zeitpunkt mittels Wirbeltransportgleichung
     % unter Berücksichtigung von Diffusion und Konvektion.
 
@@ -12,13 +12,13 @@ function Omega = tgv_updateVorticity(U, V, Omega, Psi, D1x, D1y, D2x, D2y, W, op
     convection = diag(u) * D1x + diag(v) * D1y;
 
     % Berechnung der Wirbelstärke
-    omega_W = (~W(:) .* omega) + W(:) .* (- (D2x + D2y) * psi);
+    omega_B = (~B(:) .* omega) + B(:) .* (- (D2x + D2y) * psi);
 
-    % Aktualisierung der Wirbelstärke (expliziter Euler-Schritt)
-    omega = omega + options.dt * (diffusion - convection) * omega_W;
+    % Berechnung der Wirbelstärkenänderung
+    omega_dot = (diffusion - convection) * omega_B;
 
     % Rücktransformation in Matrixform
-    Omega = reshape(omega, [options.nx, options.ny]);
+    Omega_dot = reshape(omega_dot, [options.nx, options.ny]);
 end
 
 % Wirbelstärke (ω): Maß für die lokale Rotation in der Strömung. 
