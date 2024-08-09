@@ -19,16 +19,16 @@ function options = tgv_configureSimulation()
     options.dy = (options.y_max - options.y_min) / (options.nx - 1);
 
     % Endzeit, Anzahl der Zeitschritte und Zeitschrittweite
-    options.t_end = 15;
+    options.t_end = 8;
     options.t_nr = options.t_end*20+1;
     options.dt = options.t_end / options.t_nr;
-    options.stepMethod = 'explicitEuler';    % Methode für Schrittverfahren
+    options.stepMethod = 'heun';       % Methode für Schrittverfahren
     options.max_iter = 100;                     % Maximale Anzahl von Iterationen für implizite Verfahren
-    options.tol = 1e-6;                         % Toleranz für die Iteration der impliziten Verfahren
-    % Schritt-Methoden: 'explicitEuler', 'implicitEuler', 'trapezoid', 'collatz', 'heun', 'rungeKutta2', 'rungeKutta4', 'AdamsBashforth'
+    options.tol = 1e-6;                        % Toleranz für die Iteration der impliziten Verfahren
+    % Schritt-Methoden: 'explicitEuler', 'heun', 'rungeKutta2', 'rungeKutta4', 'AdamsBashforth'
  
-    options.calcErrors = true;             % Fehlerberechnung aktivieren
-    options.calcEnergy = true;             % Energieberechnung aktivieren
+    options.calcErrors = true;              % Fehlerberechnung aktivieren
+    options.calcEnstrophy = true;           % Energieberechnung aktivieren
     options.showTraj = false;               % Bahnlinie eines Partikels anzeigen
     options.numParticles = 12;              % Startindex für die Partikel
     

@@ -16,8 +16,8 @@ function data = tgv_initSimulation(options)
     data.X_a_trail = cell(numParticles, 1);
     data.Y_a_trail = cell(numParticles, 1);
     % Arrays zur Speicherung der Enstrophie
-    data.E_kin_n = zeros(1, options.t_nr);
-    data.E_kin_a = zeros(1, options.t_nr);
+    data.enst_n = zeros(1, options.t_nr);
+    data.enst_a = zeros(1, options.t_nr);
 
     % Erstellen der Ableitungsmatrizen D1x, D1y, D2x und D2y
     [D1x, D1y] = tgv_createNabla(options);
