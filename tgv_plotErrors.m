@@ -1,7 +1,7 @@
 function pos_err_std = tgv_plotErrors(ax, pos_err_abs, titleText, options)
     % Function to create a box plot of absolute position errors
 
-    color = [1, 0.2, 0]; % Color for the box plot
+    color = [255, 51, 0]/255; % Color for the box plot
     % This function plots the particle position errors in a horizontal box chart
     cla(ax); % Clear current plot
 
@@ -13,9 +13,9 @@ function pos_err_std = tgv_plotErrors(ax, pos_err_abs, titleText, options)
     % Create the box plot
     boxchart(ax, pos_err_abs, 'Orientation', 'horizontal', 'BoxFaceColor', color, 'MarkerColor', color, 'MarkerSize', options.imgScale * 4); % Plot box plot in red color
     title(ax, titleText, 'Interpreter', 'latex'); % Set title
-    xlim(ax, [0, 0.9]); % Limit x-axis from 0 to the specified value
-    xticks(ax, linspace(0, 0.9, options.nticks+1));
-    ax.XAxis.TickLabelFormat = '%.1f'; % Set x-axis tick label format
+    xlim(ax, [0, 0.1]); % Limit x-axis from 0 to the specified value
+    xticks(ax, linspace(0, 0.1, options.nticks));
+    ax.XAxis.TickLabelFormat = '%.2f'; % Set x-axis tick label format
     ax.XAxis.Exponent = 0; % Set x-axis exponent to 0
     set(ax, 'ytick', []); % Remove y-axis ticks
     set(ax, 'yticklabel', []); % Remove y-axis labels
