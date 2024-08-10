@@ -3,10 +3,10 @@ function tgv_performSimLoop(data, options)
     dt = options.dt;
     time = linspace(0, options.t_end, options.t_nr); % Zeitvektor erstellen
 
-    X = data.X; Y = data.Y; D1x = data.D1x; D1y = data.D1y; D2x = data.D2x; D2y = data.D2y; B = data.B;
+    X = data.X; Y = data.Y; D1x = data.D1x; D1y = data.D1y; D2x = data.D2x; D2y = data.D2y; B = data.B; WH = data.WH; WV = data.WV;
     X_n_trail = data.X_n_trail; Y_n_trail = data.Y_n_trail; X_a_trail = data.X_a_trail; Y_a_trail = data.Y_a_trail;
-    particleIdx = data.particleIdx; A_L = data.A_L; A_U = data.A_U; U_a = data.U_a; V_a = data.V_a; Psi_a = data.Psi_a; 
-    colors = data.colors; fig = data.fig; WH = data.WH; WV = data.WV; enst_n = data.enst_n; enst_a = data.enst_a;
+    particleIdx = data.particleIdx; A_L = data.A_L; A_U = data.A_U; U_a = data.U_a; V_a = data.V_a; Psi_a = data.Psi_a;
+    Psi_bc = data.Psi_bc; colors = data.colors; fig = data.fig; enst_n = data.enst_n; enst_a = data.enst_a;
 
     for i = 1:length(time)
         if ~isvalid(fig) % Prüfen, ob die Figure noch existiert
@@ -23,7 +23,7 @@ function tgv_performSimLoop(data, options)
             V_n_now = V_a(t);                                               % V = -cos(X) .* sin(Y) * F_t
             Psi_n_now = Psi_a(t);                                           % ψ = sin(X) .* sin(Y) * F_t
             Omega_n_now = reshape(- (D2x + D2y) * Psi_n_now(:), size(X));   % ω = -∇²ψ
-            Omega_dot_n_now = tgv_solveVorticity(U_n_now, V_n_now, Psi_n_now, Omega_n_now, D1x, D1y, D2x, D2y, B, options);
+            Omega_dot_n_now = tgv_solveVorticity(U_n_now, V_n_now, Psi_bc, Omega_n_now, D1x, D1y, D2x, D2y, B, options);
             X_n_now = X; Y_n_now = Y;
             X_a_now = X; Y_a_now = Y;
         else
@@ -80,7 +80,7 @@ function tgv_performSimLoop(data, options)
         end
 
         % Aktualisierung der Strömungsgrößen für den nächsten Zeitschritt
-        [Psi_n_next, U_n_next, V_n_next, Omega_dot_n_next] = tgv_updateVariables(Omega_n_now, Psi_n_now, U_n_now, V_n_now, D1x, D1y, D2x, D2y, WH, WV, A_L, A_U, B, options);
+        [Psi_n_next, U_n_next, V_n_next, Omega_dot_n_next] = tgv_solveFlow(Omega_n_now, Psi_bc, U_n_now, V_n_now, D1x, D1y, D2x, D2y, A_L, A_U, B, WH, WV, options);
         X_a_next = X_a_now + dt * interp2(X, Y, U_a_now, X_a_now, Y_a_now, 'linear', 0);
         Y_a_next = Y_a_now + dt * interp2(X, Y, V_a_now, X_a_now, Y_a_now, 'linear', 0);
 
@@ -103,7 +103,7 @@ function tgv_performSimLoop(data, options)
             % Heun-Verfahren für die Wirbelstärke
             Omega_dot_k1 = Omega_dot_n_now;
             Omega_pred = Omega_n_now + dt * Omega_dot_k1;
-            Omega_dot_k2 = tgv_solveVorticity(U_n_next, V_n_next, Psi_n_next, Omega_pred, D1x, D1y, D2x, D2y, B, options);
+            Omega_dot_k2 = tgv_solveVorticity(U_n_next, V_n_next, Psi_bc, Omega_pred, D1x, D1y, D2x, D2y, B, options);
             Omega_n_next = Omega_n_now + 0.5 * dt * (Omega_dot_k1 + Omega_dot_k2);
         end
 
