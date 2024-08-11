@@ -36,7 +36,7 @@ function data = tgv_initSimulation(options)
     B(end, :) = true;   % Obere Wand
     data.B = B;
 
-    % Definition des Boolschen Vektors für die Cauchy-Riemann Gleichung
+    % Neumann-Randbedingungen für die Geschwindigkeitskomponenten U und V
     WH = false(options.nx, options.ny);
     WH(1, :) = true;     % Untere Wand
     WH(end, :) = true;   % Obere Wand
@@ -46,6 +46,10 @@ function data = tgv_initSimulation(options)
     WV(:, 1) = true;     % Linke Wand
     WV(:, end) = true;   % Rechte Wand
     data.WV = WV;
+
+    % Kontinuitätsbedingung für Psi_bc
+    Psi_bc = false(options.nx, options.ny);
+    data.Psi_bc = Psi_bc;
 
     % Aufstellen und Zerlegen der Systemmatrix für die Poisson-Gleichung
     A = diag(~B(:)) * (D2x + D2y) + diag(B(:)); % ∇² = ∂²/∂x² + ∂²/∂y²

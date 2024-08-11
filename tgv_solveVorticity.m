@@ -1,9 +1,9 @@
-function Omega_dot = tgv_solveVorticity(U, V, Psi, Omega, D1x, D1y, D1xp, D1xm, D1yp, D1ym, D2x, D2y, B, options)
+function Omega_dot = tgv_solveVorticity(U, V, Psi_bc, Omega, D1x, D1y, D1xp, D1xm, D1yp, D1ym, D2x, D2y, B, options)
     % Berechnung der Wirbelstärke ω zum nächsten Zeitpunkt mittels Wirbeltransportgleichung
     % unter Berücksichtigung von Diffusion und Konvektion.
 
     % Vektorisierung der Matrizen
-    u = U(:); v = V(:); omega = Omega(:); psi = Psi(:);
+    u = U(:); v = V(:); omega = Omega(:); psi_bc = Psi_bc(:);
 
     % Diffusionsterm: Viskose Ausbreitung der Wirbelstärke
     diffusion = options.nu * (D2x + D2y);
@@ -18,10 +18,10 @@ function Omega_dot = tgv_solveVorticity(U, V, Psi, Omega, D1x, D1y, D1xp, D1xm, 
     end
 
     % Berechnung der Wirbelstärke
-    omega_B = (~B(:) .* omega) + B(:) .* (- (D2x + D2y) * psi * 0);
+    omega_B = (~B(:) .* omega) + B(:) .* (- (D2x + D2y) * psi);
 
     % Berechnung der Wirbelstärkenänderung
-    omega_dot = (diffusion - convection) * omega_B;
+    omega_dot = (diffusion - convection) * omega_bc;
 
     % Rücktransformation in Matrixform
     Omega_dot = reshape(omega_dot, [options.nx, options.ny]);

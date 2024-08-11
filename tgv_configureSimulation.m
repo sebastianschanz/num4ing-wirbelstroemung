@@ -1,6 +1,6 @@
 function options = tgv_configureSimulation()
     % Funktion zur Konfiguration der Simulationsparameter
-    options.nu = 0.05; % Kinematische Viskosität
+    options.nu = 0.01; % Kinematische Viskosität
     options.rho = 1.0; % Dichte des Fluids
     options.mu = options.nu * options.rho; % Dynamische Viskosität
     options.nx = 50; % Anzahl der Gitterpunkte in x-Richtung
@@ -39,6 +39,6 @@ function options = tgv_configureSimulation()
     options.imgWidth = 400;                 % Bildbreite
     options.imgHeight = options.imgWidth;   % Bildhöhe
     options.fontSize = 8;                   % Grund-Schriftgröße
-    options.imgScale = 1;                   % 1-1.8, Skalierungsfaktor für Bildauflösung, hochschrauben für schönere Gifs
-    options.filename = '.\simulation_energy_15_nu_0.08.gif'; % Dateiname für die GIF-Datei
+    options.imgScale = 1.0;                   % 1-1.8, Skalierungsfaktor für Bildauflösung, hochschrauben für schönere Gifs
+    options.filename = '.\export\simulation_enstrophy_8_nu_0.1.gif'; % Dateiname für die GIF-Datei
 end
