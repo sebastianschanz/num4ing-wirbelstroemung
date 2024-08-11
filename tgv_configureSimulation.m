@@ -23,7 +23,7 @@ function options = tgv_configureSimulation()
     options.t_nr = options.t_end*20+1;
     options.dt = options.t_end / options.t_nr;
     options.stepMethod = 'explicitEuler';       % Methode für Schrittverfahren
-    options.Aufwind = true;
+    options.Aufwind = true;                     % Aufwind Methode Anwenden oder nicht
     options.max_iter = 100;                     % Maximale Anzahl von Iterationen für implizite Verfahren
     options.tol = 1e-6;                        % Toleranz für die Iteration der impliziten Verfahren
     % Schritt-Methoden: 'explicitEuler', 'heun', 'rungeKutta2', 'rungeKutta4', 'AdamsBashforth'
