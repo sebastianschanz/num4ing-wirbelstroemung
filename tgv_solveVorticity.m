@@ -1,4 +1,4 @@
-function Omega_dot = tgv_solveVorticity(U, V, Psi, Omega, D1x, D1y, D2x, D2y, B, options)
+function Omega_dot = tgv_solveVorticity(U, V, Psi, Omega, D1x, D1y, D1xp, D1xm, D1yp, D1ym, D2x, D2y, B, options)
     % Berechnung der Wirbelstärke ω zum nächsten Zeitpunkt mittels Wirbeltransportgleichung
     % unter Berücksichtigung von Diffusion und Konvektion.
 
@@ -8,11 +8,17 @@ function Omega_dot = tgv_solveVorticity(U, V, Psi, Omega, D1x, D1y, D2x, D2y, B,
     % Diffusionsterm: Viskose Ausbreitung der Wirbelstärke
     diffusion = options.nu * (D2x + D2y);
 
-    % Konvektionsterm: Transport der Wirbelstärke durch die Strömung
-    convection = diag(u) * D1x + diag(v) * D1y;
+    if options.Aufwind == false
+        % Konvektionsterm: Transport der Wirbelstärke durch die Strömung
+        convection = diag(u) * D1x + diag(v) * D1y;
+    else
+        % Konvektionsterm: Transport der Wirbelstärke durch die Strömung mit Aufwind-Verfahren
+        up = max(u,0); um = min(u,0); vp = max(v,0); vm = min(v,0); 
+        convection = diag(um) * D1xp + diag(up) * D1xm + diag(vm) * D1yp + diag(vp) * D1ym;
+    end
 
     % Berechnung der Wirbelstärke
-    omega_B = (~B(:) .* omega) + B(:) .* (- (D2x + D2y) * psi);
+    omega_B = (~B(:) .* omega) + B(:) .* (- (D2x + D2y) * psi * 0);
 
     % Berechnung der Wirbelstärkenänderung
     omega_dot = (diffusion - convection) * omega_B;

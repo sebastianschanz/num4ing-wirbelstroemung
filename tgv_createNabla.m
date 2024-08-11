@@ -26,15 +26,21 @@ function [D1x, D1y] = tgv_createNabla(options)
     left_edge = (1:ny)';
     D1x(sub2ind([N, N], left_edge, left_edge)) = -1 / dx; % Setzt diagonales Element am linken Rand von D1x auf -1/dx
     D1x(sub2ind([N, N], left_edge, left_edge + ny)) = 1 / dx; % Setzt Element rechts neben dem diagonalen Element auf 1/dx
-    D1y(sub2ind([N, N], left_edge, left_edge)) = -1 / dy; % Setzt diagonales Element am linken Rand von D1y auf -1/dy
-    D1y(sub2ind([N, N], left_edge, left_edge + 1)) = 1 / dy; % Setzt Element rechts neben dem diagonalen Element auf 1/dy
 
     % Rückwärtsdifferenzen am rechten Rand (letzte Spalte)
     right_edge = (N - ny + 1:N)';
     D1x(sub2ind([N, N], right_edge, right_edge)) = 1 / dx; % Setzt diagonales Element am rechten Rand von D1x auf 1/dx
     D1x(sub2ind([N, N], right_edge, right_edge - ny)) = -1 / dx; % Setzt Element links neben dem diagonalen Element auf -1/dx
-    D1y(sub2ind([N, N], right_edge, right_edge)) = 1 / dy; % Setzt diagonales Element am rechten Rand von D1y auf 1/dy
-    D1y(sub2ind([N, N], right_edge, right_edge - 1)) = -1 / dy; % Setzt Element links neben dem diagonalen Element auf -1/dy
+
+    % Periodische RB
+    % % Vorwärtsdifferenzen am linken Rand (erste Spalte)
+    % left_edge = (1:ny)'; % linker Rand
+    % right_edge = (N - ny + 1:N)'; % rechter Rand
+    % D1x(sub2ind([N, N], left_edge, left_edge + ny)) = 1 / dx;
+    % D1x(sub2ind([N, N], left_edge, right_edge - ny)) = -1 / dx;
+
+    % D1x(sub2ind([N, N], right_edge, right_edge - ny)) = -1 / dx; 
+    % D1x(sub2ind([N, N], right_edge, left_edge + ny)) = 1 / dx;
 
     % Vorwärtsdifferenzen am unteren Rand (erste Zeile)
     bottom_edge = (1:nx:ny * nx)';

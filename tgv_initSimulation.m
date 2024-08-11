@@ -24,6 +24,10 @@ function data = tgv_initSimulation(options)
     [D2x, D2y] = tgv_createLaplace(options);
     data.D1x = D1x;   data.D1y = D1y;   data.D2x = D2x;   data.D2y = D2y;
 
+    % Erstellt die Ableitungsmatrizen für das Aufwind-Verfahren
+    [D1xp, D1xm, D1yp, D1ym] = tgv_createNablaAufwind(options);
+    data.D1xp = D1xp;   data.D1xm = D1xm;   data.D1yp = D1yp;   data.D1ym = D1ym;
+
     % Definition des Boolschen Vektors für die Poisson-Gleichung
     B = false(options.nx, options.ny);
     B(:, 1) = true;     % Linke Wand
