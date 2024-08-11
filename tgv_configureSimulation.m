@@ -1,6 +1,6 @@
 function options = tgv_configureSimulation()
     % Funktion zur Konfiguration der Simulationsparameter
-    options.nu = 0.01; % Kinematische Viskosität
+    options.nu = 0.005; % Kinematische Viskosität
     options.rho = 1.0; % Dichte des Fluids
     options.mu = options.nu * options.rho; % Dynamische Viskosität
     options.nx = 50; % Anzahl der Gitterpunkte in x-Richtung
@@ -23,7 +23,7 @@ function options = tgv_configureSimulation()
     options.t_nr = options.t_end*20+1;
     options.dt = options.t_end / options.t_nr;
     options.stepMethod = 'explicitEuler';       % Methode für Schrittverfahren
-    options.Aufwind = true;                     % Aufwind Methode Anwenden oder nicht
+    options.Aufwind = false;                     % Aufwind Methode Anwenden oder nicht
     options.max_iter = 100;                     % Maximale Anzahl von Iterationen für implizite Verfahren
     options.tol = 1e-6;                        % Toleranz für die Iteration der impliziten Verfahren
     % Schritt-Methoden: 'explicitEuler', 'heun', 'rungeKutta2', 'rungeKutta4', 'AdamsBashforth'
