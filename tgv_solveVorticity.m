@@ -18,7 +18,7 @@ function Omega_dot = tgv_solveVorticity(U, V, Psi_bc, Omega, D1x, D1y, D1xp, D1x
     end
 
     % Berechnung der Wirbelstärke
-    omega_B = (~B(:) .* omega) + B(:) .* (- (D2x + D2y) * psi);
+    omega_bc = (~B(:) .* omega) + B(:) .* (- (D2x + D2y) * psi_bc);
 
     % Berechnung der Wirbelstärkenänderung
     omega_dot = (diffusion - convection) * omega_bc;
