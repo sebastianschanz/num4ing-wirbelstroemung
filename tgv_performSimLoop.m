@@ -18,19 +18,13 @@ function tgv_performSimLoop(data, options)
         clf(fig); % Figure löschen, bevor neuer Frame gezeichnet wird
         
         % Aktuelle Variablen initialisieren
-        Psi_a_now = Psi_a(t); U_a_now = U_a(t); V_a_now = V_a(t); % Analytische Lösung aktualisieren
         if t == 0
-            U_n_now = U_a(t);                                               % U = sin(X) .* cos(Y) * F_t
-            V_n_now = V_a(t);                                               % V = -cos(X) .* sin(Y) * F_t
-            Psi_n_now = Psi_a(t);                                           % ψ = sin(X) .* sin(Y) * F_t
-            Omega_n_now = reshape(- (D2x + D2y) * Psi_n_now(:), size(X));   % ω = -∇²ψ
-            Omega_dot_n_now = tgv_solveVorticity(U_n_now, V_n_now, Psi_bc, Omega_n_now, D1x, D1y, D1xp, D1xm, D1yp, D1ym, D2x, D2y, B, options);
-            X_n_now = X; Y_n_now = Y;
-            X_a_now = X; Y_a_now = Y;
+            Psi_n_now = Psi_a(t); U_n_now = U_a(t); V_n_now = V_a(t); X_n_now = X; Y_n_now = Y;
+            Omega_n_now = reshape(- (D2x + D2y) * Psi_n_now(:), size(X));
+            Psi_a_now = Psi_a(t); U_a_now = U_a(t); V_a_now = V_a(t); X_a_now = X; Y_a_now = Y;
         else
-            Omega_n_now = Omega_n_next; Omega_dot_n_now = Omega_dot_n_next; Psi_n_now = Psi_n_next; % Numerische Lösung für t aktualisieren     
-            X_n_now = X_n_next; Y_n_now = Y_n_next; U_n_now = U_n_next; V_n_now = V_n_next;
-            X_a_now = X_a_next; Y_a_now = Y_a_next;
+            Psi_n_now = Psi_n_next; U_n_now = U_n_next; V_n_now = V_n_next; Omega_n_now = Omega_n_next; X_n_now = X_n_next; Y_n_now = Y_n_next;     
+            Psi_a_now = Psi_a_next; U_a_now = U_a_next; V_a_now = V_a_next; X_a_now = X_a_next; Y_a_now = Y_a_next;
         end
 
         % Plots für die numerische und analytische Lösung
@@ -81,37 +75,79 @@ function tgv_performSimLoop(data, options)
             end
         end
 
-        % Aktualisierung der Strömungsgrößen für den nächsten Zeitschritt
-        [Psi_n_next, U_n_next, V_n_next, Omega_dot_n_next] = tgv_solveFlow(Omega_n_now, Psi_bc, U_n_now, V_n_now, D1x, D1y, D1xp, D1xm, D1yp, D1ym, D2x, D2y, A_L, A_U, B, WH, WV, options);
-        X_a_next = X_a_now + dt * interp2(X, Y, U_a_now, X_a_now, Y_a_now, 'linear', 0);
-        Y_a_next = Y_a_now + dt * interp2(X, Y, V_a_now, X_a_now, Y_a_now, 'linear', 0);
-
-        % Zeitschrittverfahren für die numerische Lösung
-        if strcmp(options.stepMethod, 'explicitEuler')
-            X_n_next = X_n_now + dt * interp2(X, Y, U_n_now, X_n_now, Y_n_now, 'linear', 0);
-            Y_n_next = Y_n_now + dt * interp2(X, Y, V_n_now, X_n_now, Y_n_now, 'linear', 0);
-            Omega_n_next = Omega_n_now + dt * Omega_dot_n_now;
-            % Implementierung eines impliziten Eulerverfahrens für die Wirbelstärke Omega
+        if strcmp(options.stepMethod, 'exEuler')
+            subSteps = 1;
         elseif strcmp(options.stepMethod, 'heun')
-            % Heun-Verfahren für die Positionen
-            U_k1 = interp2(X, Y, U_n_now, X_n_now, Y_n_now, 'linear', 0);
-            V_k1 = interp2(X, Y, V_n_now, X_n_now, Y_n_now, 'linear', 0);
-            X_n_pred = X_n_now + dt * U_k1;
-            Y_n_pred = Y_n_now + dt * V_k1;
-            U_k2 = interp2(X, Y, U_n_next, X_n_pred, Y_n_pred, 'linear', 0);
-            V_k2 = interp2(X, Y, V_n_next, X_n_pred, Y_n_pred, 'linear', 0);
-            X_n_next = X_n_now + 0.5 * dt * (U_k1 + U_k2);
-            Y_n_next = Y_n_now + 0.5 * dt * (V_k1 + V_k2);
-            % Heun-Verfahren für die Wirbelstärke
-            Omega_dot_k1 = Omega_dot_n_now;
-            Omega_pred = Omega_n_now + dt * Omega_dot_k1;
-            Omega_dot_k2 = tgv_solveVorticity(U_n_next, V_n_next, Psi_bc, Omega_pred, D1x, D1y, D1xp, D1xm, D1yp, D1ym, D2x, D2y, B, options);
-            Omega_n_next = Omega_n_now + 0.5 * dt * (Omega_dot_k1 + Omega_dot_k2);
+            subSteps = 2;
+        elseif strcmp(options.stepMethod, 'rk4')
+            subSteps = 4;
         end
 
+        % Erstelle cells für jede Variable für k_n
+        Psi_n_k = cell(subSteps, 1);
+        Omega_n_k = cell(subSteps, 1);
+        Omega_dot_n_k = cell(subSteps, 1);
+        X_n_k = cell(subSteps, 1);
+        Y_n_k = cell(subSteps, 1);
+        U_n_k = cell(subSteps, 1);
+        V_n_k = cell(subSteps, 1);
+
+        Psi_a_k = cell(subSteps, 1);
+        X_a_k = cell(subSteps, 1);
+        Y_a_k = cell(subSteps, 1);
+        U_a_k = cell(subSteps, 1);
+        V_a_k = cell(subSteps, 1);
+
+        for n = 1:subSteps
+            disp(['substep ', num2str(n), ' of ', num2str(subSteps)]);
+            if n == 1
+                U_n_k{n} = U_n_now;   V_n_k{n} = V_n_now; X_n_k{n} = X_n_now; Y_n_k{n} = Y_n_now;
+                Omega_n_k{n} = Omega_n_now; U_n_k{n} = U_n_now;   V_n_k{n} = V_n_now;
+                [Psi_n_k{n}, U_n_k{n}, V_n_k{n}, Omega_dot_n_k{n}] = tgv_solveFlow(Omega_n_k{n}, Psi_bc, U_n_k{n}, V_n_k{n}, D1x, D1y, D1xp, D1xm, D1yp, D1ym, D2x, D2y, A_L, A_U, B, WH, WV, options);
+                
+                U_a_k{n} = U_a_now; V_a_k{n} = V_a_now; X_a_k{n} = X_a_now; Y_a_k{n} = Y_a_now;   
+                Psi_a_k{n} = Psi_a(t + (n-1) * dt); U_a_k{n} = U_a(t + (n-1) * dt); V_a_k{n} = V_a(t + (n-1) * dt);
+            else
+                X_n_k{n} = X_n_k{n-1} + dt * interp2(X, Y, U_n_k{n-1}, X_n_k{n-1}, Y_n_k{n-1}, 'linear', 0);
+                Y_n_k{n} = Y_n_k{n-1} + dt * interp2(X, Y, V_n_k{n-1}, X_n_k{n-1}, Y_n_k{n-1}, 'linear', 0);
+                Omega_n_k{n} = Omega_n_k{n-1} + dt * Omega_dot_n_k{n-1};
+                [Psi_n_k{n}, U_n_k{n}, V_n_k{n}, Omega_dot_n_k{n}] = tgv_solveFlow(Omega_n_k{n-1}, Psi_bc, U_n_k{n-1}, V_n_k{n-1}, D1x, D1y, D1xp, D1xm, D1yp, D1ym, D2x, D2y, A_L, A_U, B, WH, WV, options);
+
+                X_a_k{n} = X_a_k{n-1} + dt * interp2(X, Y, U_a_k{n-1}, X_a_k{n-1}, Y_a_k{n-1}, 'linear', 0);
+                Y_a_k{n} = Y_a_k{n-1} + dt * interp2(X, Y, V_a_k{n-1}, X_a_k{n-1}, Y_a_k{n-1}, 'linear', 0);
+                Psi_a_k{n} = Psi_a(t + (n-1) * dt); U_a_k{n} = U_a(t + (n-1) * dt); V_a_k{n} = V_a(t + (n-1) * dt);
+            end
+            if strcmp(options.stepMethod, 'exEuler')
+                X_n_next = X_n_k{1} + dt * interp2(X, Y, U_n_k{1}, X_n_k{1}, Y_n_k{1}, 'linear', 0);
+                Y_n_next = Y_n_k{1} + dt * interp2(X, Y, V_n_k{1}, X_n_k{1}, Y_n_k{1}, 'linear', 0);
+                Omega_n_next = Omega_n_k{1} + dt * Omega_dot_n_k{1};
+
+                X_a_next = X_a_k{1} + dt * interp2(X, Y, U_a_k{1}, X_a_k{1}, Y_a_k{1}, 'linear', 0);
+                Y_a_next = Y_a_k{1} + dt * interp2(X, Y, V_a_k{1}, X_a_k{1}, Y_a_k{1}, 'linear', 0);
+            elseif strcmp(options.stepMethod, 'heun')
+                if n == subSteps
+                    X_n_next = X_n_k{1} + dt/2 * (interp2(X, Y, U_n_k{1}, X_n_k{1}, Y_n_k{1}, 'linear', 0) + interp2(X, Y, U_n_k{2}, X_n_k{2}, Y_n_k{2}, 'linear', 0));
+                    Y_n_next = Y_n_k{1} + dt/2 * (interp2(X, Y, V_n_k{1}, X_n_k{1}, Y_n_k{1}, 'linear', 0) + interp2(X, Y, V_n_k{2}, X_n_k{2}, Y_n_k{2}, 'linear', 0));
+                    Omega_n_next = Omega_n_k{1} + dt/2 * (Omega_dot_n_k{1} + Omega_dot_n_k{2});
+
+                    X_a_next = X_a_k{1} + dt/2 * (interp2(X, Y, U_a_k{1}, X_a_k{1}, Y_a_k{1}, 'linear', 0) + interp2(X, Y, U_a_k{2}, X_a_k{2}, Y_a_k{2}, 'linear', 0));
+                    Y_a_next = Y_a_k{1} + dt/2 * (interp2(X, Y, V_a_k{1}, X_a_k{1}, Y_a_k{1}, 'linear', 0) + interp2(X, Y, V_a_k{2}, X_a_k{2}, Y_a_k{2}, 'linear', 0));
+                end
+            elseif strcmp(options.stepMethod, 'rk4')
+                if n == subSteps
+                    X_n_next = X_n_k{1} + dt/6 * (interp2(X, Y, U_n_k{1}, X_n_k{1}, Y_n_k{1}, 'linear', 0) + 2 * interp2(X, Y, U_n_k{2}, X_n_k{2}, Y_n_k{2}, 'linear', 0) + 2 * interp2(X, Y, U_n_k{3}, X_n_k{3}, Y_n_k{3}, 'linear', 0) + interp2(X, Y, U_n_k{4}, X_n_k{4}, Y_n_k{4}, 'linear', 0));
+                    Y_n_next = Y_n_k{1} + dt/6 * (interp2(X, Y, V_n_k{1}, X_n_k{1}, Y_n_k{1}, 'linear', 0) + 2 * interp2(X, Y, V_n_k{2}, X_n_k{2}, Y_n_k{2}, 'linear', 0) + 2 * interp2(X, Y, V_n_k{3}, X_n_k{3}, Y_n_k{3}, 'linear', 0) + interp2(X, Y, V_n_k{4}, X_n_k{4}, Y_n_k{4}, 'linear', 0));
+                    Omega_n_next = Omega_n_k{1} + dt/6 * (Omega_dot_n_k{1} + 2 * Omega_dot_n_k{2} + 2 * Omega_dot_n_k{3} + Omega_dot_n_k{4});
+                    X_a_next = X_a_k{1} + dt/6 * (interp2(X, Y, U_a_k{1}, X_a_k{1}, Y_a_k{1}, 'linear', 0) + 2 * interp2(X, Y, U_a_k{2}, X_a_k{2}, Y_a_k{2}, 'linear', 0) + 2 * interp2(X, Y, U_a_k{3}, X_a_k{3}, Y_a_k{3}, 'linear', 0) + interp2(X, Y, U_a_k{4}, X_a_k{4}, Y_a_k{4}, 'linear', 0));
+                    Y_a_next = Y_a_k{1} + dt/6 * (interp2(X, Y, V_a_k{1}, X_a_k{1}, Y_a_k{1}, 'linear', 0) + 2 * interp2(X, Y, V_a_k{2}, X_a_k{2}, Y_a_k{2}, 'linear', 0) + 2 * interp2(X, Y, V_a_k{3}, X_a_k{3}, Y_a_k{3}, 'linear', 0) + interp2(X, Y, V_a_k{4}, X_a_k{4}, Y_a_k{4}, 'linear', 0));
+                end
+            end
+            Psi_n_next = Psi_n_k{1}; U_n_next = U_n_k{1}; V_n_next = V_n_k{1};
+            Psi_a_next = Psi_a_k{1}; U_a_next = U_a_k{1}; V_a_next = V_a_k{1};
+        end   
 
         % Titel für die Figure aktualisieren
-        sgtitle(['TGW Sim.', ', Integration Method: ', options.stepMethod, ', $\nu=$', num2str(options.nu), ', t=', num2str(t, '%.2f')], 'Interpreter', 'latex', 'FontSize', options.imgScale*(options.fontSize+5));
+        sgtitle(['TGW Sim.', ', Integrationsmethode: ', options.stepMethod, ', $\nu=$', num2str(options.nu), ', t=', num2str(t, '%.2f')], 'Interpreter', 'latex', 'FontSize', options.imgScale*(options.fontSize+5));
 
         drawnow; % Plot aktualisieren
         if options.writeGif
