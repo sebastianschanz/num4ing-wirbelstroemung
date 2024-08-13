@@ -24,7 +24,7 @@ function tgv_performSimLoop(data, options)
             V_n_now = V_a(t);                                               % V = -cos(X) .* sin(Y) * F_t
             Psi_n_now = Psi_a(t);                                           % ψ = sin(X) .* sin(Y) * F_t
             Omega_n_now = reshape(- (D2x + D2y) * Psi_n_now(:), size(X));   % ω = -∇²ψ
-            Omega_dot_n_now = tgv_solveVorticity(U_n_now, V_n_now, Psi_n_now, Omega_n_now, D1x, D1y, D1xp, D1xm, D1yp, D1ym, D2x, D2y, B, options);
+            Omega_dot_n_now = tgv_solveVorticity(U_n_now, V_n_now, Psi_bc, Omega_n_now, D1x, D1y, D1xp, D1xm, D1yp, D1ym, D2x, D2y, B, options);
             X_n_now = X; Y_n_now = Y;
             X_a_now = X; Y_a_now = Y;
         else
@@ -105,13 +105,13 @@ function tgv_performSimLoop(data, options)
             % Heun-Verfahren für die Wirbelstärke
             Omega_dot_k1 = Omega_dot_n_now;
             Omega_pred = Omega_n_now + dt * Omega_dot_k1;
-            Omega_dot_k2 = tgv_solveVorticity(U_n_next, V_n_next, Psi_bc, Omega_pred, D1x, D1y, D1x, D1y, D1xp, D1xm, D2x, D2y, B, options);
+            Omega_dot_k2 = tgv_solveVorticity(U_n_next, V_n_next, Psi_bc, Omega_pred, D1x, D1y, D1xp, D1xm, D1yp, D1ym, D2x, D2y, B, options);
             Omega_n_next = Omega_n_now + 0.5 * dt * (Omega_dot_k1 + Omega_dot_k2);
         end
 
 
         % Titel für die Figure aktualisieren
-        sgtitle(['Taylor-Green-Wirbel mit ', '$\nu=', num2str(options.nu), ',~t=', num2str(t, '%.2f'), '$'], 'Interpreter', 'latex', 'FontSize', options.imgScale*(options.fontSize+5));
+        sgtitle(['TGW Sim.', ', Integration Method: ', options.stepMethod, ', $\nu=$', num2str(options.nu), ', t=', num2str(t, '%.2f')], 'Interpreter', 'latex', 'FontSize', options.imgScale*(options.fontSize+5));
 
         drawnow; % Plot aktualisieren
         if options.writeGif
