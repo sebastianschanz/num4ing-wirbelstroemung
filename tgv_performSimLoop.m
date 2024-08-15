@@ -8,6 +8,7 @@ function tgv_performSimLoop(data, options)
     D1xp = data.D1xp; D1xm = data.D1xm; D1yp = data.D1yp; D1ym = data.D1ym; % Aufwind Differenzenmatrizen
     particleIdx = data.particleIdx; A_L = data.A_L; A_U = data.A_U; U_a = data.U_a; V_a = data.V_a; Psi_a = data.Psi_a;
     Psi_bc = data.Psi_bc; colors = data.colors; fig = data.fig; enst_n = data.enst_n; enst_a = data.enst_a;
+    CFLx = data.CFLx; CFLy = data.CFLy; CFLmax = data.CFLmax; % CFL-Matrizen
 
     for i = 1:length(time)
         if ~isvalid(fig) % Prüfen, ob die Figure noch existiert
@@ -72,6 +73,13 @@ function tgv_performSimLoop(data, options)
                 text(subplot(2, 3, 6, 'Parent', fig), 0, -0.23, ['MSE $\Psi_{err}$: ', sprintf('%.8f', psi_mse_err)], ...
                     'Units', 'normalized', 'HorizontalAlignment', 'left', ...
                     'VerticalAlignment', 'top', 'FontSize', options.imgScale*(options.fontSize), 'Interpreter', 'latex');
+            end
+            if options.calcCFL
+                % CFL-Felder berechnen
+                CFLx = abs(U_n_now) .* dt ./ options.dx;
+                CFLy = abs(V_n_now) .* dt ./ options.dy;
+                CFLmax = max(max(CFLx,[],"all"), max(CFLy,[],"all"));
+                disp("max. CFL = " + CFLmax);
             end
         end
 

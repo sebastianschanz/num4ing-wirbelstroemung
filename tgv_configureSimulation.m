@@ -30,6 +30,7 @@ function options = tgv_configureSimulation()
  
     options.calcErrors = true;              % Fehlerberechnung aktivieren
     options.calcEnstrophy = true;           % Energieberechnung aktivieren
+    options.calcCFL = true;                 % maximale CFL-Zahl berechnen
     options.showTraj = false;               % Bahnlinie eines Partikels anzeigen
     options.numParticles = 12;              % Startindex für die Partikel
     
