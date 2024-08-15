@@ -132,28 +132,29 @@ function tgv_performSimLoop(data, options)
             X_a_k{n+1} = X_a_k{n} + dt * interp2(X, Y, U_a_k{n}, X_a_k{n}, Y_a_k{n}, 'linear', 0);
             Y_a_k{n+1} = Y_a_k{n} + dt * interp2(X, Y, V_a_k{n}, X_a_k{n}, Y_a_k{n}, 'linear', 0);
 
-            if strcmp(options.stepMethod, 'exEuler')
-                X_n_next = X_n_k{1} + dt * interp2(X, Y, U_n_k{1}, X_n_k{1}, Y_n_k{1}, 'linear', 0);
-                Y_n_next = Y_n_k{1} + dt * interp2(X, Y, V_n_k{1}, X_n_k{1}, Y_n_k{1}, 'linear', 0);
-                Omega_n_next = Omega_n_k{1} + dt * Omega_dot_n_k{2};
-                X_a_next = X_a_k{1} + dt * interp2(X, Y, U_a_k{1}, X_a_k{1}, Y_a_k{1}, 'linear', 0);
-                Y_a_next = Y_a_k{1} + dt * interp2(X, Y, V_a_k{1}, X_a_k{1}, Y_a_k{1}, 'linear', 0);
-            elseif strcmp(options.stepMethod, 'heun')
-                if n == subSteps
-                    X_n_next = X_n_k{1} + dt/2 * (interp2(X, Y, U_n_k{1}, X_n_k{1}, Y_n_k{1}, 'linear', 0) + interp2(X, Y, U_n_k{2}, X_n_k{2}, Y_n_k{2}, 'linear', 0));
-                    Y_n_next = Y_n_k{1} + dt/2 * (interp2(X, Y, V_n_k{1}, X_n_k{1}, Y_n_k{1}, 'linear', 0) + interp2(X, Y, V_n_k{2}, X_n_k{2}, Y_n_k{2}, 'linear', 0));
-                    Omega_n_next = Omega_n_k{1} + dt/2 * (Omega_dot_n_k{2} + Omega_dot_n_k{3});
-                    X_a_next = X_a_k{1} + dt/2 * (interp2(X, Y, U_a_k{1}, X_a_k{1}, Y_a_k{1}, 'linear', 0) + interp2(X, Y, U_a_k{2}, X_a_k{2}, Y_a_k{2}, 'linear', 0));
-                    Y_a_next = Y_a_k{1} + dt/2 * (interp2(X, Y, V_a_k{1}, X_a_k{1}, Y_a_k{1}, 'linear', 0) + interp2(X, Y, V_a_k{2}, X_a_k{2}, Y_a_k{2}, 'linear', 0));
-                end
-            elseif strcmp(options.stepMethod, 'rk4')
-                if n == subSteps
-                    X_n_next = X_n_k{1} + dt/6 * (interp2(X, Y, U_n_k{1}, X_n_k{1}, Y_n_k{1}, 'linear', 0) + 2 * interp2(X, Y, U_n_k{2}, X_n_k{2}, Y_n_k{2}, 'linear', 0) + 2 * interp2(X, Y, U_n_k{3}, X_n_k{3}, Y_n_k{3}, 'linear', 0) + interp2(X, Y, U_n_k{4}, X_n_k{4}, Y_n_k{4}, 'linear', 0));
-                    Y_n_next = Y_n_k{1} + dt/6 * (interp2(X, Y, V_n_k{1}, X_n_k{1}, Y_n_k{1}, 'linear', 0) + 2 * interp2(X, Y, V_n_k{2}, X_n_k{2}, Y_n_k{2}, 'linear', 0) + 2 * interp2(X, Y, V_n_k{3}, X_n_k{3}, Y_n_k{3}, 'linear', 0) + interp2(X, Y, V_n_k{4}, X_n_k{4}, Y_n_k{4}, 'linear', 0));
-                    Omega_n_next = Omega_n_k{1} + dt/6 * (Omega_dot_n_k{2} + 2 * Omega_dot_n_k{3} + 2 * Omega_dot_n_k{4} + Omega_dot_n_k{5});
-                    X_a_next = X_a_k{1} + dt/6 * (interp2(X, Y, U_a_k{1}, X_a_k{1}, Y_a_k{1}, 'linear', 0) + 2 * interp2(X, Y, U_a_k{2}, X_a_k{2}, Y_a_k{2}, 'linear', 0) + 2 * interp2(X, Y, U_a_k{3}, X_a_k{3}, Y_a_k{3}, 'linear', 0) + interp2(X, Y, U_a_k{4}, X_a_k{4}, Y_a_k{4}, 'linear', 0));
-                    Y_a_next = Y_a_k{1} + dt/6 * (interp2(X, Y, V_a_k{1}, X_a_k{1}, Y_a_k{1}, 'linear', 0) + 2 * interp2(X, Y, V_a_k{2}, X_a_k{2}, Y_a_k{2}, 'linear', 0) + 2 * interp2(X, Y, V_a_k{3}, X_a_k{3}, Y_a_k{3}, 'linear', 0) + interp2(X, Y, V_a_k{4}, X_a_k{4}, Y_a_k{4}, 'linear', 0));
-                end
+            switch options.stepMethod
+                case 'exEuler'
+                    X_n_next = X_n_k{1} + dt * interp2(X, Y, U_n_k{1}, X_n_k{1}, Y_n_k{1}, 'linear', 0);
+                    Y_n_next = Y_n_k{1} + dt * interp2(X, Y, V_n_k{1}, X_n_k{1}, Y_n_k{1}, 'linear', 0);
+                    Omega_n_next = Omega_n_k{1} + dt * Omega_dot_n_k{2};
+                    X_a_next = X_a_k{1} + dt * interp2(X, Y, U_a_k{1}, X_a_k{1}, Y_a_k{1}, 'linear', 0);
+                    Y_a_next = Y_a_k{1} + dt * interp2(X, Y, V_a_k{1}, X_a_k{1}, Y_a_k{1}, 'linear', 0);
+                case 'heun'
+                    if n == subSteps
+                        X_n_next = X_n_k{1} + dt/2 * (interp2(X, Y, U_n_k{1}, X_n_k{1}, Y_n_k{1}, 'linear', 0) + interp2(X, Y, U_n_k{2}, X_n_k{2}, Y_n_k{2}, 'linear', 0));
+                        Y_n_next = Y_n_k{1} + dt/2 * (interp2(X, Y, V_n_k{1}, X_n_k{1}, Y_n_k{1}, 'linear', 0) + interp2(X, Y, V_n_k{2}, X_n_k{2}, Y_n_k{2}, 'linear', 0));
+                        Omega_n_next = Omega_n_k{1} + dt/2 * (Omega_dot_n_k{2} + Omega_dot_n_k{3});
+                        X_a_next = X_a_k{1} + dt/2 * (interp2(X, Y, U_a_k{1}, X_a_k{1}, Y_a_k{1}, 'linear', 0) + interp2(X, Y, U_a_k{2}, X_a_k{2}, Y_a_k{2}, 'linear', 0));
+                        Y_a_next = Y_a_k{1} + dt/2 * (interp2(X, Y, V_a_k{1}, X_a_k{1}, Y_a_k{1}, 'linear', 0) + interp2(X, Y, V_a_k{2}, X_a_k{2}, Y_a_k{2}, 'linear', 0));
+                    end
+                case 'rk4'
+                    if n == subSteps
+                        X_n_next = X_n_k{1} + dt/6 * (interp2(X, Y, U_n_k{1}, X_n_k{1}, Y_n_k{1}, 'linear', 0) + 2 * interp2(X, Y, U_n_k{2}, X_n_k{2}, Y_n_k{2}, 'linear', 0) + 2 * interp2(X, Y, U_n_k{3}, X_n_k{3}, Y_n_k{3}, 'linear', 0) + interp2(X, Y, U_n_k{4}, X_n_k{4}, Y_n_k{4}, 'linear', 0));
+                        Y_n_next = Y_n_k{1} + dt/6 * (interp2(X, Y, V_n_k{1}, X_n_k{1}, Y_n_k{1}, 'linear', 0) + 2 * interp2(X, Y, V_n_k{2}, X_n_k{2}, Y_n_k{2}, 'linear', 0) + 2 * interp2(X, Y, V_n_k{3}, X_n_k{3}, Y_n_k{3}, 'linear', 0) + interp2(X, Y, V_n_k{4}, X_n_k{4}, Y_n_k{4}, 'linear', 0));
+                        Omega_n_next = Omega_n_k{1} + dt/6 * (Omega_dot_n_k{2} + 2 * Omega_dot_n_k{3} + 2 * Omega_dot_n_k{4} + Omega_dot_n_k{5});
+                        X_a_next = X_a_k{1} + dt/6 * (interp2(X, Y, U_a_k{1}, X_a_k{1}, Y_a_k{1}, 'linear', 0) + 2 * interp2(X, Y, U_a_k{2}, X_a_k{2}, Y_a_k{2}, 'linear', 0) + 2 * interp2(X, Y, U_a_k{3}, X_a_k{3}, Y_a_k{3}, 'linear', 0) + interp2(X, Y, U_a_k{4}, X_a_k{4}, Y_a_k{4}, 'linear', 0));
+                        Y_a_next = Y_a_k{1} + dt/6 * (interp2(X, Y, V_a_k{1}, X_a_k{1}, Y_a_k{1}, 'linear', 0) + 2 * interp2(X, Y, V_a_k{2}, X_a_k{2}, Y_a_k{2}, 'linear', 0) + 2 * interp2(X, Y, V_a_k{3}, X_a_k{3}, Y_a_k{3}, 'linear', 0) + interp2(X, Y, V_a_k{4}, X_a_k{4}, Y_a_k{4}, 'linear', 0));
+                    end
             end
             Psi_n_next = Psi_n_k{2}; U_n_next = U_n_k{2}; V_n_next = V_n_k{2};
             Psi_a_next = Psi_a_k{2}; U_a_next = U_a_k{2}; V_a_next = V_a_k{2};
