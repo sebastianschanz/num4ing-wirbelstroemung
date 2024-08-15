@@ -15,6 +15,7 @@ function data = tgv_initSimulation(options)
     data.Y_n_trail = cell(numParticles, 1);
     data.X_a_trail = cell(numParticles, 1);
     data.Y_a_trail = cell(numParticles, 1);
+
     % Arrays zur Speicherung der Enstrophie
     data.enst_n = zeros(1, options.t_nr);
     data.enst_a = zeros(1, options.t_nr);
