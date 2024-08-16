@@ -7,7 +7,7 @@ function tgv_performSimLoop(data, options)
     X_n_trail = data.X_n_trail; Y_n_trail = data.Y_n_trail; X_a_trail = data.X_a_trail; Y_a_trail = data.Y_a_trail;
     D1xp = data.D1xp; D1xm = data.D1xm; D1yp = data.D1yp; D1ym = data.D1ym; % Aufwind Differenzenmatrizen
     particleIdx = data.particleIdx; A_L = data.A_L; A_U = data.A_U; U_a = data.U_a; V_a = data.V_a; Psi_a = data.Psi_a;
-    Psi_bc = data.Psi_bc; colors = data.colors; fig = data.fig; enst_n = data.enst_n; enst_a = data.enst_a;
+    Psi_bc = data.Psi_bc; colors = data.colors; fig = data.fig; enst_n = data.enst_n; enst_a = data.enst_a; energy_n = data.energy_n; energy_a = data.energy_a;
     CFLx = data.CFLx; CFLy = data.CFLy; CFLmax = data.CFLmax; % CFL-Matrizen
 
     for i = 1:length(time)
@@ -65,10 +65,10 @@ function tgv_performSimLoop(data, options)
             if options.calcEnstrophy
                 % 6. Kinetische Energie berechnen
                 Omega_a_now = reshape(- (D2x + D2y) * Psi_a_now(:), size(X)); % ω = -∇²ψ
-                enst_n(i) = tgv_calcEnergy(Omega_n_now, options);
-                enst_a(i) = tgv_calcEnergy(Omega_a_now, options);
+                [energy_n(i), enst_n(i)] = tgv_calcEnergy(Omega_n_now, U_n_now, V_n_now, options);
+                [energy_a(i), enst_a(i)] = tgv_calcEnergy(Omega_a_now, U_a_now, V_a_now, options);
                 % Plot der kinetischen Energie
-                tgv_plotEnergy(subplot(2, 3, 6, 'Parent', fig), time(1:i), enst_n(1:i), enst_a(1:i), options);
+                tgv_plotEnergy(subplot(2, 3, 6, 'Parent', fig), time(1:i), enst_n(1:i), enst_a(1:i), energy_n(1:i), energy_a(1:i), options);
                 % disp([num2str(enst_n(i), '%.2f'), ' - Numerisch  |  ', num2str(enst_a(i), '%.2f'), ' - Analytisch']) - Ausgabe Enstrophie
             else
                 % Erstellt einen Plot der Fehler der Stromfunktion
