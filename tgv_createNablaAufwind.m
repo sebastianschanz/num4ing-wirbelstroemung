@@ -32,15 +32,28 @@ function [D1xp, D1xm, D1yp, D1ym] = tgv_createNablaAufwind(options)
     top_edge = (ny:ny:N)';
 
     % RB
-    D1xp(sub2ind([N, N], left_edge, left_edge)) = -1 / dx;
-    D1xp(sub2ind([N, N], left_edge, left_edge + ny)) = 1 / dx;
+    % D1xp(sub2ind([N, N], left_edge, left_edge)) = -1 / dx;
+    % D1xp(sub2ind([N, N], left_edge, left_edge + ny)) = 1 / dx;
 
-    D1xm(sub2ind([N, N], right_edge, right_edge)) = 1 / dx;
-    D1xm(sub2ind([N, N], right_edge, right_edge - ny)) = -1 / dx;
+    % D1xm(sub2ind([N, N], right_edge, right_edge)) = 1 / dx;
+    % D1xm(sub2ind([N, N], right_edge, right_edge - ny)) = -1 / dx;
 
-    D1yp(sub2ind([N, N], top_edge, top_edge)) = -1 / dx;
-    D1yp(sub2ind([N, N], top_edge, top_edge - 1)) = 1 / dx;
+    % D1yp(sub2ind([N, N], top_edge, top_edge)) = -1 / dx;
+    % D1yp(sub2ind([N, N], top_edge, top_edge - 1)) = 1 / dx;
 
-    D1ym(sub2ind([N, N], bottom_edge, bottom_edge)) = 1 / dx;
-    D1ym(sub2ind([N, N], bottom_edge, bottom_edge + 1)) = -1 / dx;
+    % D1ym(sub2ind([N, N], bottom_edge, bottom_edge)) = 1 / dx;
+    % D1ym(sub2ind([N, N], bottom_edge, bottom_edge + 1)) = -1 / dx;
+
+    % RB 
+    D1xm(sub2ind([N, N], left_edge, left_edge)) = -1 / dx;
+    D1xm(sub2ind([N, N], left_edge, left_edge + ny)) = 1 / dx;
+
+    D1xp(sub2ind([N, N], right_edge, right_edge)) = 1 / dx;
+    D1xp(sub2ind([N, N], right_edge, right_edge - ny)) = -1 / dx;
+
+    D1ym(sub2ind([N, N], top_edge, top_edge)) = -1 / dx;
+    D1ym(sub2ind([N, N], top_edge, top_edge - 1)) = 1 / dx;
+
+    D1yp(sub2ind([N, N], bottom_edge, bottom_edge)) = 1 / dx;
+    D1yp(sub2ind([N, N], bottom_edge, bottom_edge + 1)) = -1 / dx;
 end
