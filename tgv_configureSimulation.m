@@ -19,28 +19,28 @@ function options = tgv_configureSimulation()
     options.dy = (options.y_max - options.y_min) / (options.nx - 1);
 
     % Endzeit, Anzahl der Zeitschritte und Zeitschrittweite
-    options.t_end = 8;
-    options.t_nr = options.t_end*20+1;
+    options.t_end = 10;
+    options.t_nr = options.t_end*40+1;
     options.dt = options.t_end / options.t_nr;
-    options.stepMethod = 'rk4';       % Methode für Schrittverfahren
-    options.Aufwind = false;                     % Aufwind Methode Anwenden oder nicht
-    options.max_iter = 100;                     % Maximale Anzahl von Iterationen für implizite Verfahren
-    options.tol = 1e-6;                        % Toleranz für die Iteration der impliziten Verfahren
-    % Schritt-Methoden: 'exEuler', 'heun', 'rk4'
+    options.stepMethod = 'imEuler';             % Methode für Schrittverfahren
+    options.Aufwind = false;                % Aufwind Methode Anwenden oder nicht
+    options.maxIter = 100;                 % Maximale Anzahl von Iterationen für implizite Verfahren
+    options.tol = 1e-6;                     % Toleranz für die Iteration der impliziten Verfahren
+    % Schritt-Methoden: 'exEuler', 'imEuler', 'heun', 'rk4'
  
     options.calcErrors = true;              % Fehlerberechnung aktivieren
-    options.calcEnstrophy = true;           % Energieberechnung aktivieren
-    options.calcCFL = false;                 % maximale CFL-Zahl berechnen
+    options.calcEnergy = true;              % Energieberechnung aktivieren
+    options.calcCFL = false;                % maximale CFL-Zahl berechnen
     options.showTraj = false;               % Bahnlinie eines Partikels anzeigen
     options.numParticles = 12;              % Startindex für die Partikel
     
-    options.writeGif = false;                % GIF-Datei schreiben
+    options.writeGif = true;               % GIF-Datei schreiben
     options.colormap = 'parula';            % Farbkarte für die Darstellung
     options.nticks = 3;                     % Anzahl der Ticks auf Achsenen
     options.imgWidth = 400;                 % Bildbreite
     options.imgHeight = options.imgWidth;   % Bildhöhe
     options.fontSize = 8;                   % Grund-Schriftgröße
-    options.imgScale = 1.5;                   % 1-1.8, Skalierungsfaktor für Bildauflösung, hochschrauben für schönere Gifs
+    options.imgScale = 1.0;                   % 1-1.8, Skalierungsfaktor für Bildauflösung, hochschrauben für schönere Gifs
     options.filename = sprintf('.\\export\\simulation_%s_nu_%.2f_tend_%d.gif', ...
                                 options.stepMethod, options.nu, options.t_end);
 end
