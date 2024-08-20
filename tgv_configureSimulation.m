@@ -5,7 +5,7 @@ function options = tgv_configureSimulation()
     options.mu = options.nu * options.rho; % Dynamische Viskosität
     options.nx = 50; % Anzahl der Gitterpunkte in x-Richtung
     options.ny = 50; % Anzahl der Gitterpunkte in y-Richtung
-    options.CFLmax = 0.2; % CFL-Bedingung
+    options.CFLmax = 0.3; % CFL-Bedingung
 
     % Intervallgrenzen in x-, y- und z-Richtung
     options.x_min = 0;

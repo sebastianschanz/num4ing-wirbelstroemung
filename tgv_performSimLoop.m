@@ -5,14 +5,13 @@ function tgv_performSimLoop(data, options)
     D1xp = data.D1xp; D1xm = data.D1xm; D1yp = data.D1yp; D1ym = data.D1ym; % Aufwind Differenzenmatrizen
     particleIdx = data.particleIdx; A_L = data.A_L; A_U = data.A_U; U_a = data.U_a; V_a = data.V_a; Psi_a = data.Psi_a;
     Psi_bc = data.Psi_bc; colors = data.colors; fig = data.fig; enst_n = data.enst_n; enst_a = data.enst_a; energy_n = data.energy_n; energy_a = data.energy_a;
-    dx = options.dx; dy = options.dy; CFLmax = options.CFLmax; timesteps = data.timesteps;
+    dx = options.dx; dy = options.dy; CFLmax = options.CFLmax; timesteps = data.timesteps; time = data.time;
 
     % Zeit initialisieren
     t = 0;
-    time = [];
 
     % Ersten Timestep (nur zur approx. der neuen Geschwindikeiten)
-    dt = CFLmax * dx / 1 % entspricht ca max. Geschwindigkeit
+    %dt = CFLmax * dx / 1; % entspricht ca max. Geschwindigkeit 
 
     % Iterationen zählen
     i = 0;
@@ -27,7 +26,7 @@ function tgv_performSimLoop(data, options)
 
         % Iterationen zählen und Zeitpunkte speichern
         i = i + 1;
-        time = [time, t];
+        time(i) = t;
 
         tic;
         clf(fig); % Figure löschen, bevor neuer Frame gezeichnet wird
@@ -56,7 +55,7 @@ function tgv_performSimLoop(data, options)
         dtx = CFLmax  * dx / max(abs(U_n_now),[],"all");
         dty = CFLmax * dy / max(abs(V_n_now),[],"all");
         dt = min(dtx, dty);
-        timesteps = [timesteps, dt];
+        timesteps(i) = dt;
 
         % Plots für die numerische und analytische Lösung
         if options.showTraj

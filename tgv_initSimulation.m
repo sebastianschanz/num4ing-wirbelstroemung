@@ -5,8 +5,9 @@ function data = tgv_initSimulation(options)
     [X, Y] = meshgrid(x, y);
     data.X = X;   data.Y = Y;
 
-    % Initialisierung Vektor, um Zeitschritte zu speichern
-    data.timesteps = [];
+    % Initialisierung Vektoren, um Zeitschritte und Zeitpunkte zu speichern
+    data.timesteps = zeros(200);
+    data.time = zeros(200);
 
     % Zufällige Auswahl der Partikel für das Plotten der Bahnlinien
     numParticles = options.numParticles;
