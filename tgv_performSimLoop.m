@@ -156,15 +156,21 @@ function tgv_performSimLoop(data, options)
                 case 'imEuler'
                     % Implizites Euler-Verfahren mit Fixpunktiteration
                     Omega_n_next = Omega_n_k{n};  % Startwert als aktuellen Wert verwenden
+                    X_n_next = X_n_k{n}; Y_n_next = Y_n_k{n}; X_a_next = X_a_k{n}; Y_a_next = Y_a_k{n};
                     
                     for iter = 1:options.maxIter
                         % Berechne die neue Schätzung für Omega_n_next
                         Omega_n_new = Omega_n_k{n} + dt * tgv_solveVorticity(U_n_k{n}, V_n_k{n}, Psi_bc, Omega_n_next, D1x, D1y, D1xp, D1xm, D1yp, D1ym, D2x, D2y, B, options);
+                        X_n_new = X_n_k{n} + dt * interp2(X, Y, U_n_k{n}, X_n_next, Y_n_next, 'linear', 0);
+                        Y_n_new = Y_n_k{n} + dt * interp2(X, Y, V_n_k{n}, X_n_next, Y_n_next, 'linear', 0);
+                        X_a_new = X_a_k{n} + dt * interp2(X, Y, U_a_k{n}, X_a_next, Y_a_next, 'linear', 0);
+                        Y_a_new = Y_a_k{n} + dt * interp2(X, Y, V_a_k{n}, X_a_next, Y_a_next, 'linear', 0);
                         
-                        if norm(Omega_n_new - Omega_n_next, 'fro') < options.tol % Abbruchkriterium
+                        if norm(Omega_n_new - Omega_n_next, 'fro') < options.tol && norm(X_n_new - X_n_next, 'fro') < options.tol && norm(Y_n_new - Y_n_next, 'fro') < options.tol && norm(X_a_new - X_a_next, 'fro') < options.tol && norm(Y_a_new - Y_a_next, 'fro') < options.tol
                             break;
                         end
                         Omega_n_next = Omega_n_new; % Neue Schätzung als Startwert für die nächste Iteration verwenden
+                        X_n_next = X_n_new; Y_n_next = Y_n_new; X_a_next = X_a_new; Y_a_next = Y_a_new;
                     end
                     
                     % Berechnung des nächsten Schritts mit solveFlow
