@@ -1,20 +1,34 @@
 function tgv_performSimLoop(data, options)
     % Funktion zur Ausführung der Aktualisierungsschleife der Taylor-Green-Wirbel-Simulation
-    dt = options.dt;
-    time = linspace(0, options.t_end, options.t_nr); % Zeitvektor erstellen
-
     X = data.X; Y = data.Y; D1x = data.D1x; D1y = data.D1y; D2x = data.D2x; D2y = data.D2y; B = data.B; WH = data.WH; WV = data.WV;
     X_n_trail = data.X_n_trail; Y_n_trail = data.Y_n_trail; X_a_trail = data.X_a_trail; Y_a_trail = data.Y_a_trail;
     D1xp = data.D1xp; D1xm = data.D1xm; D1yp = data.D1yp; D1ym = data.D1ym; % Aufwind Differenzenmatrizen
     particleIdx = data.particleIdx; A_L = data.A_L; A_U = data.A_U; U_a = data.U_a; V_a = data.V_a; Psi_a = data.Psi_a;
     Psi_bc = data.Psi_bc; colors = data.colors; fig = data.fig; enst_n = data.enst_n; enst_a = data.enst_a; energy_n = data.energy_n; energy_a = data.energy_a;
-    CFLx = data.CFLx; CFLy = data.CFLy; CFLmax = data.CFLmax; % CFL-Matrizen
+    dx = options.dx; dy = options.dy; CFLmax = options.CFLmax; timesteps = data.timesteps;
 
-    for i = 1:length(time)
+    % Zeit initialisieren
+    t = 0;
+    time = [];
+
+    % Ersten Timestep (nur zur approx. der neuen Geschwindikeiten)
+    dt = CFLmax * dx / 1 % entspricht ca max. Geschwindigkeit
+
+    % Iterationen zählen
+    i = 0;
+
+    while true
         if ~isvalid(fig) % Prüfen, ob die Figure noch existiert
             break;
         end
-        t = time(i);
+        if t >= options.t_end
+            break;
+        end
+
+        % Iterationen zählen und Zeitpunkte speichern
+        i = i + 1;
+        time = [time, t];
+
         tic;
         clf(fig); % Figure löschen, bevor neuer Frame gezeichnet wird
         
@@ -24,12 +38,25 @@ function tgv_performSimLoop(data, options)
             Omega_n_now = reshape(- (D2x + D2y) * Psi_n_now(:), size(X));
             Omega_dot_n_init = zeros(size(X));
             Psi_a_now = Psi_a(t); U_a_now = U_a(t); V_a_now = V_a(t); X_a_now = X; Y_a_now = Y;
+            % Ersten Zeitschritt mit CFL-Bedingung berechnen
+            %dtx = CFLmax  * dx / max(abs(U_n_now),[],"all");
+            %dty = CFLmax * dy / max(abs(V_n_now),[],"all");
+            %dt = min(dtx, dty);
         else
             Psi_n_now = Psi_n_next; U_n_now = U_n_next; V_n_now = V_n_next; Omega_n_now = Omega_n_next;
             X_n_now = X_n_next; Y_n_now = Y_n_next;     
             Psi_a_now = Psi_a_next; U_a_now = U_a_next; V_a_now = V_a_next; 
             X_a_now = X_a_next; Y_a_now = Y_a_next;
+            % Neuen Zeitschritt mit CFL-Bedingung berechnen
+            %dtx = CFLmax  * dx / max(abs(U_n_next),[],"all");
+            %dty = CFLmax * dy / max(abs(V_n_next),[],"all");
+            %dt = min(dtx, dty);
         end
+        % Neuen Zeitschritt mit CFL-Bedingung berechnen
+        dtx = CFLmax  * dx / max(abs(U_n_now),[],"all");
+        dty = CFLmax * dy / max(abs(V_n_now),[],"all");
+        dt = min(dtx, dty);
+        timesteps = [timesteps, dt];
 
         % Plots für die numerische und analytische Lösung
         if options.showTraj
@@ -51,7 +78,7 @@ function tgv_performSimLoop(data, options)
         tgv_plotStreamFunction(subplot(2, 3- ~options.calcErrors, 4 - ~options.calcErrors, 'Parent', fig), X, Y, Psi_n_now, 'Stromfunktion $\Psi_n$ (num.)', 'x', 'y', '$\Psi_n$', options);
         tgv_plotStreamFunction(subplot(2, 3 - ~options.calcErrors, 5 - ~options.calcErrors, 'Parent', fig), X, Y, Psi_a_now, 'Stromfunktion $\Psi_a$ (ana.)', 'x', 'y', '$\Psi_a$', options);
 
-        %Wenn Option calcErrors oder calcEnergy aktiviert ist
+        % Wenn Option calcErrors oder calcEnergy aktiviert ist
         if options.calcErrors
             % 5. Fehler der analytischen und numerischen Lösung berechnen
             [pos_err_abs, Psi_err, psi_mse_err] = tgv_calcErrors(X_n_now, Y_n_now, X_a_now, Y_a_now, Psi_n_now, Psi_a_now);
@@ -76,13 +103,6 @@ function tgv_performSimLoop(data, options)
                 text(subplot(2, 3, 6, 'Parent', fig), 0, -0.23, ['MSE $\Psi_{err}$: ', sprintf('%.8f', psi_mse_err)], ...
                     'Units', 'normalized', 'HorizontalAlignment', 'left', ...
                     'VerticalAlignment', 'top', 'FontSize', options.imgScale*(options.fontSize), 'Interpreter', 'latex');
-            end
-            if options.calcCFL
-                % CFL-Felder berechnen
-                CFLx = abs(U_n_now) .* dt ./ options.dx;
-                CFLy = abs(V_n_now) .* dt ./ options.dy;
-                CFLmax = max(max(CFLx,[],"all"), max(CFLy,[],"all"));
-                disp("max. CFL = " + CFLmax);
             end
         end
 
@@ -170,8 +190,11 @@ function tgv_performSimLoop(data, options)
 
         elapsedTime = toc; % Berechnungsdauer stoppen
         disp([num2str(t, '%.2f'), ' von ', num2str(options.t_end, '%.2f'), ' s, Speed: ', num2str(elapsedTime, '%.2f'), ' s']);
-    end
 
+        % Zeit aktualisieren
+        t = t + dt;
+    end
+    plot(timesteps);
     if isvalid(fig)
         close(fig);
     end

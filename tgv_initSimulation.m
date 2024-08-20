@@ -5,6 +5,9 @@ function data = tgv_initSimulation(options)
     [X, Y] = meshgrid(x, y);
     data.X = X;   data.Y = Y;
 
+    % Initialisierung Vektor, um Zeitschritte zu speichern
+    data.timesteps = [];
+
     % Zufällige Auswahl der Partikel für das Plotten der Bahnlinien
     numParticles = options.numParticles;
     totalParticles = numel(X);
@@ -17,10 +20,10 @@ function data = tgv_initSimulation(options)
     data.Y_a_trail = cell(numParticles, 1);
 
     % Arrays zur Speicherung der Enstrophie und kinetischen Energy
-    data.enst_n = zeros(1, options.t_nr);
-    data.enst_a = zeros(1, options.t_nr);
-    data.energy_n = zeros(1, options.t_nr);
-    data.energy_a = zeros(1, options.t_nr);
+    data.enst_n = [];
+    data.enst_a = [];
+    data.energy_n = [];
+    data.energy_a = [];
 
     % Erstellen der Ableitungsmatrizen D1x, D1y, D2x und D2y
     [D1x, D1y] = tgv_createNabla(options);
@@ -58,11 +61,6 @@ function data = tgv_initSimulation(options)
     A = diag(~B(:)) * (D2x + D2y) + diag(B(:)); % ∇² = ∂²/∂x² + ∂²/∂y²
     [A_L, A_U] = lu(A);                         % LU-Zerlegung der Systemmatrix
     data.A_L = A_L;   data.A_U = A_U;
-
-    % Initialisierung der CFL-Matrizen
-    data.CFLx = zeros(options.nx, options.ny);
-    data.CFLy = zeros(options.nx, options.ny);
-    data.CFLmax = 0;
     
     % Analytische Lösung des Taylor-Green-Vortex
     U_a = @(t) sin(X) .* cos(Y) .* exp(-2 * options.nu * t);    % Analytische Geschwindigkeitskomponente U

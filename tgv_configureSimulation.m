@@ -5,6 +5,7 @@ function options = tgv_configureSimulation()
     options.mu = options.nu * options.rho; % Dynamische Viskosität
     options.nx = 50; % Anzahl der Gitterpunkte in x-Richtung
     options.ny = 50; % Anzahl der Gitterpunkte in y-Richtung
+    options.CFLmax = 0.2; % CFL-Bedingung
 
     % Intervallgrenzen in x-, y- und z-Richtung
     options.x_min = 0;
@@ -18,11 +19,8 @@ function options = tgv_configureSimulation()
     options.dx = (options.x_max - options.x_min) / (options.nx - 1);
     options.dy = (options.y_max - options.y_min) / (options.nx - 1);
 
-    % Endzeit, Anzahl der Zeitschritte und Zeitschrittweite
-    options.t_end = 8;
-    options.t_nr = options.t_end*20+1;
-    options.dt = options.t_end / options.t_nr;
-    options.stepMethod = 'rk4';       % Methode für Schrittverfahren
+    options.t_end = 8;                          % Endzeit der Simulation
+    options.stepMethod = 'exEuler';       % Methode für Schrittverfahren
     options.Aufwind = false;                     % Aufwind Methode Anwenden oder nicht
     options.max_iter = 100;                     % Maximale Anzahl von Iterationen für implizite Verfahren
     options.tol = 1e-6;                        % Toleranz für die Iteration der impliziten Verfahren
@@ -30,7 +28,6 @@ function options = tgv_configureSimulation()
  
     options.calcErrors = true;              % Fehlerberechnung aktivieren
     options.calcEnstrophy = true;           % Energieberechnung aktivieren
-    options.calcCFL = false;                 % maximale CFL-Zahl berechnen
     options.showTraj = false;               % Bahnlinie eines Partikels anzeigen
     options.numParticles = 12;              % Startindex für die Partikel
     
