@@ -1,6 +1,6 @@
 function options = tgv_configureSimulation()
     % Funktion zur Konfiguration der Simulationsparameter
-    options.nu = 0.1; % Kinematische Viskosität
+    options.nu = 0.2; % Kinematische Viskosität
     options.rho = 1.0; % Dichte des Fluids
     options.mu = options.nu * options.rho; % Dynamische Viskosität
     options.nx = 50; % Anzahl der Gitterpunkte in x-Richtung
@@ -22,7 +22,7 @@ function options = tgv_configureSimulation()
     options.t_end = 8;
     options.t_nr = options.t_end*20+1;
     options.dt = options.t_end / options.t_nr;
-    options.stepMethod = 'rk4';             % Methode für Schrittverfahren
+    options.stepMethod = 'heun';             % Methode für Schrittverfahren
     options.Aufwind = false;                % Aufwind Methode Anwenden oder nicht
     options.maxIter = 100;                 % Maximale Anzahl von Iterationen für implizite Verfahren
     options.tol = 1e-6;                     % Toleranz für die Iteration der impliziten Verfahren
@@ -34,7 +34,7 @@ function options = tgv_configureSimulation()
     options.showTraj = false;               % Bahnlinie eines Partikels anzeigen
     options.numParticles = 12;              % Startindex für die Partikel
     
-    options.writeGif = false;               % GIF-Datei schreiben
+    options.writeGif = true;               % GIF-Datei schreiben
     options.colormap = 'parula';            % Farbkarte für die Darstellung
     options.nticks = 3;                     % Anzahl der Ticks auf Achsenen
     options.imgWidth = 400;                 % Bildbreite
