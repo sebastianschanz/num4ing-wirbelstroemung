@@ -63,7 +63,9 @@ function data = tgv_initSimulation(options)
     U_a = @(t) sin(X) .* cos(Y) .* exp(-2 * options.nu * t);    % Analytische Geschwindigkeitskomponente U
     V_a = @(t) -cos(X) .* sin(Y) .* exp(-2 * options.nu * t);   % Analytische Geschwindigkeitskomponente V
     Psi_a = @(t) sin(X) .* sin(Y) .* exp(-2 * options.nu * t);  % Analytische Stromfunktion
-    data.U_a = U_a;   data.V_a = V_a;   data.Psi_a = Psi_a;
+    Omega_a = @(t) 2 * sin(X) .* sin(Y) .* exp(-2 * options.nu * t); % Analytische Rotation
+    Omega_dot_a = @(t) -4 * sin(X) .* sin(Y) .* exp(-2 * options.nu * t) * options.nu; % Analytische Rotation
+    data.U_a = U_a;   data.V_a = V_a;   data.Psi_a = Psi_a;   data.Omega_a = Omega_a;   data.Omega_dot_a = Omega_dot_a;
     
     colors = tgv_initColors(Y, options); % Farben für die Partikel initialisieren
     data.colors = colors;

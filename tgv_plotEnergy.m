@@ -25,8 +25,8 @@ function tgv_plotEnergy(ax, time, enst_n, enst_a, energy_n, energy_a, options)
 
     xticks(ax, linspace(0, options.t_end, options.nticks));
     xlim(ax, [0, options.t_end]);
-    yticks(ax, linspace(-5, 10, options.nticks+1));
-    ylim(ax, [-5, 10]);
+    yticks(ax, linspace(options.y2_min, options.y2_max, options.nticks+1));
+    ylim(ax, [options.y2_min, options.y2_max]);
     lgd = legend(ax, 'Location', 'northeast', 'Interpreter', 'latex', 'FontSize', options.imgScale*options.fontSize);
     lgd.FontSize = lgd.FontSize / 2;
     hold(ax, 'off'); % Plot in der Achse freigeben

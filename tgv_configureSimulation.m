@@ -13,6 +13,8 @@ function options = tgv_configureSimulation()
     options.y_max = 2 * pi;
     options.z_min = -1;
     options.z_max = 1;
+    options.y2_min = -10;
+    options.y2_max = 10;
     
     % Gitterabstände in x- und y-Richtung
     options.dx = (options.x_max - options.x_min) / (options.nx - 1);

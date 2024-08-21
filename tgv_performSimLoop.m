@@ -6,7 +6,7 @@ function tgv_performSimLoop(data, options)
     X = data.X; Y = data.Y; D1x = data.D1x; D1y = data.D1y; D2x = data.D2x; D2y = data.D2y; B = data.B; WH = data.WH; WV = data.WV;
     X_n_trail = data.X_n_trail; Y_n_trail = data.Y_n_trail; X_a_trail = data.X_a_trail; Y_a_trail = data.Y_a_trail;
     D1xp = data.D1xp; D1xm = data.D1xm; D1yp = data.D1yp; D1ym = data.D1ym; % Aufwind Differenzenmatrizen
-    particleIdx = data.particleIdx; A_L = data.A_L; A_U = data.A_U; U_a = data.U_a; V_a = data.V_a; Psi_a = data.Psi_a;
+    particleIdx = data.particleIdx; A_L = data.A_L; A_U = data.A_U; U_a = data.U_a; V_a = data.V_a; Psi_a = data.Psi_a; Omega_a = data.Omega_a; Omega_dot_a = data.Omega_dot_a;
     Psi_bc = data.Psi_bc; colors = data.colors; fig = data.fig; enst_n = data.enst_n; enst_a = data.enst_a; energy_n = data.energy_n; energy_a = data.energy_a;
 
     for i = 1:length(time)
@@ -19,14 +19,16 @@ function tgv_performSimLoop(data, options)
         
         % Aktuelle Variablen initialisieren
         if t == 0
-            Psi_n_now = Psi_a(t); U_n_now = U_a(t); V_n_now = V_a(t); X_n_now = X; Y_n_now = Y;
-            Omega_n_now = reshape(- (D2x + D2y) * Psi_n_now(:), size(X));
-            Omega_dot_n_now = zeros(size(X));
-            Psi_a_now = Psi_a(t); U_a_now = U_a(t); V_a_now = V_a(t); X_a_now = X; Y_a_now = Y;
+            Psi_n_now = Psi_a(0); U_n_now = U_a(0); V_n_now = V_a(0); X_n_now = X; Y_n_now = Y;
+            Omega_n_now = Omega_a(0); Omega_dot_n_now = Omega_dot_a(0);
+
+            Psi_a_now = Psi_a(0); U_a_now = U_a(0); V_a_now = V_a(0); X_a_now = X; Y_a_now = Y;
+            Omega_a_now = Omega_a(0); Omega_dot_a_now = Omega_dot_a(0);
         else
             Psi_n_now = Psi_n_next; U_n_now = U_n_next; V_n_now = V_n_next; Omega_n_now = Omega_n_next; Omega_dot_n_now = Omega_dot_n_next;
-            X_n_now = X_n_next; Y_n_now = Y_n_next;     
-            Psi_a_now = Psi_a_next; U_a_now = U_a_next; V_a_now = V_a_next; 
+            X_n_now = X_n_next; Y_n_now = Y_n_next;    
+
+            Psi_a_now = Psi_a_next; U_a_now = U_a_next; V_a_now = V_a_next; Omega_a_now = Omega_a_next; Omega_dot_a_now = Omega_dot_a_next;
             X_a_now = X_a_next; Y_a_now = Y_a_next;
         end
 
@@ -89,36 +91,32 @@ function tgv_performSimLoop(data, options)
             case 'exEuler'
                 % Numerische Lösung aktualisieren
                 [Psi_n_next, U_n_next, V_n_next, Omega_dot_n_next] = tgv_solveFlow(Omega_n_now, Psi_bc, U_n_now, V_n_now, D1x, D1y, D1xp, D1xm, D1yp, D1ym, D2x, D2y, A_L, A_U, B, WH, WV, options);
-                Omega_n_next = Omega_n_now + dt * Omega_dot_n_next;
+                Omega_n_next = Omega_n_now + dt * Omega_dot_n_now;
                 X_n_next = X_n_now + dt * interp2(X, Y, U_n_now, X_n_now, Y_n_now, 'linear', 0);
                 Y_n_next = Y_n_now + dt * interp2(X, Y, V_n_now, X_n_now, Y_n_now, 'linear', 0);
 
                 % Analytische Lösung für den nächsten Zeitschritt berechnen
-                Psi_a_next = Psi_a(t + dt); U_a_next = U_a(t + dt); V_a_next = V_a(t + dt);
+                Psi_a_next = Psi_a(t); U_a_next = U_a(t); V_a_next = V_a(t); Omega_a_next = Omega_a(t); Omega_dot_a_next = Omega_dot_a(t);
                 X_a_next = X_a_now + dt * interp2(X, Y, U_a_now, X_a_now, Y_a_now, 'linear', 0);
                 Y_a_next = Y_a_now + dt * interp2(X, Y, V_a_now, X_a_now, Y_a_now, 'linear', 0);
             case 'heun'
                 % Prädiktionsschritt (Numerisch)
-                [Psi_pred, U_pred, V_pred, Omega_dot_pred] = tgv_solveFlow(Omega_n_now, Psi_bc, U_n_now, V_n_now, D1x, D1y, D1xp, D1xm, D1yp, D1ym, D2x, D2y, A_L, A_U, B, WH, WV, options);
-                Omega_pred = Omega_n_now + dt * Omega_dot_pred;
-                
-                % Korrekturschritt (Numerisch)
-                Omega_dot_n_next = (Omega_dot_n_now + Omega_dot_pred) / 2;  % Mittelwert der Ableitungen
+                [Psi_n_next, U_n_pred, V_n_pred, Omega_dot_n_pred] = tgv_solveFlow(Omega_n_now, Psi_bc, U_n_now, V_n_now, D1x, D1y, D1xp, D1xm, D1yp, D1ym, D2x, D2y, A_L, A_U, B, WH, WV, options);
+                Omega_dot_n_next = (Omega_dot_n_now + Omega_dot_n_pred) / 2;  % Mittelwert der Ableitungen der Wirbelstärke
+                U_n_next = (U_n_now + U_n_pred) / 2;  % Mittelwert der Geschwindigkeiten in x-Richtung
+                V_n_next = (V_n_now + V_n_pred) / 2;  % Mittelwert der Geschwindigkeiten in y-Richtung
                 Omega_n_next = Omega_n_now + dt * Omega_dot_n_next;
-                [Psi_n_next, U_n_next, V_n_next, ~] = tgv_solveFlow(Omega_n_next, Psi_bc, U_pred, V_pred, D1x, D1y, D1xp, D1xm, D1yp, D1ym, D2x, D2y, A_L, A_U, B, WH, WV, options);
-                
-                % Numerische Positionen aktualisieren
-                X_n_next = X_n_now + dt/2 * (interp2(X, Y, U_n_now, X_n_now, Y_n_now, 'linear', 0) + interp2(X, Y, U_pred, X_n_now, Y_n_now, 'linear', 0));
-                Y_n_next = Y_n_now + dt/2 * (interp2(X, Y, V_n_now, X_n_now, Y_n_now, 'linear', 0) + interp2(X, Y, V_pred, X_n_now, Y_n_now, 'linear', 0));
+                X_n_next = X_n_now + dt * interp2(X, Y, U_n_next, X_n_now, Y_n_now, 'linear', 0);
+                Y_n_next = Y_n_now + dt * interp2(X, Y, V_n_next, X_n_now, Y_n_now, 'linear', 0);
             
                 % Analytische Lösung für den nächsten Zeitschritt berechnen
-                Psi_a_next = Psi_a(t + dt);
-                U_a_next = U_a(t + dt);
-                V_a_next = V_a(t + dt);
-                X_a_next = X_a_now + dt/2 * (interp2(X, Y, U_a_now, X_a_now, Y_a_now, 'linear', 0) + interp2(X, Y, U_a(t + dt), X_a_now, Y_a_now, 'linear', 0));
-                Y_a_next = Y_a_now + dt/2 * (interp2(X, Y, V_a_now, X_a_now, Y_a_now, 'linear', 0) + interp2(X, Y, V_a(t + dt), X_a_now, Y_a_now, 'linear', 0));
+                Psi_a_next = Psi_a(t); U_a_next = U_a(t); V_a_next = V_a(t); Omega_a_next = Omega_a(t); Omega_dot_a_next = Omega_dot_a(t);
+                X_a_pred = X_a_now + dt * interp2(X, Y, U_a_now, X_a_now, Y_a_now, 'linear', 0);
+                Y_a_pred = Y_a_now + dt * interp2(X, Y, V_a_now, X_a_now, Y_a_now, 'linear', 0);
+                X_a_next = X_a_now + dt/2 * (interp2(X, Y, U_a_now, X_a_now, Y_a_now, 'linear', 0) + interp2(X, Y, U_a(t + dt), X_a_pred, Y_a_pred, 'linear', 0));
+                Y_a_next = Y_a_now + dt/2 * (interp2(X, Y, V_a_now, X_a_now, Y_a_now, 'linear', 0) + interp2(X, Y, V_a(t + dt), X_a_pred, Y_a_pred, 'linear', 0));
             case 'imEuler'
-                subSteps = 1;
+
             otherwise
                 error('Unbekannte Integrationsmethode.');
         end
