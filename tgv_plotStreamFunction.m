@@ -7,7 +7,7 @@ function tgv_plotStreamFunction(ax, X, Y, Psi, titleText, xlabelText, ylabelText
     ylabel(ax, ylabelText, 'Interpreter', 'latex'); % Y-Achsenbeschriftung
     zlabel(ax, zlabelText, 'Interpreter', 'latex'); % Z-Achsenbeschriftung
     axis(ax, 'square'); % Achsenverhältnis beibehalten
-    set(ax, 'Color', 'none'); % Hintergrund entfernen
+    %set(ax, 'Color', 'none'); % Hintergrund entfernen
     set(ax, 'FontSize', options.imgScale*options.fontSize);
     set(get(ax, 'Title'), 'FontSize', options.imgScale*(options.fontSize+2));
     view(ax, 3); % 3D-Ansicht für Oberflächenplots setzen
@@ -25,8 +25,8 @@ function tgv_plotStreamFunction(ax, X, Y, Psi, titleText, xlabelText, ylabelText
         xticks(ax, linspace(xRange(1), xRange(2), options.nticks));
         xticklabels(ax, {xRange(1), xRange(2)});
     else
-        xlim(ax, [options.x_min options.x_max]);
-        xticks(ax, linspace(options.x_min, options.x_max, options.nticks));
+        xlim(ax, [options.xMin options.xMax]);
+        xticks(ax, linspace(options.xMin, options.xMax, options.nticks));
         xticklabels(ax, {'0', '\pi', '2\cdot\pi'});
     end
 
@@ -36,8 +36,8 @@ function tgv_plotStreamFunction(ax, X, Y, Psi, titleText, xlabelText, ylabelText
         yticks(ax, linspace(yRange(1), yRange(2), options.nticks));
         yticklabels(ax, {yRange(1), yRange(2)});
     else
-        ylim(ax, [options.y_min options.y_max]);
-        yticks(ax, linspace(options.y_min, options.y_max, options.nticks));
+        ylim(ax, [options.yMin options.yMax]);
+        yticks(ax, linspace(options.yMin, options.yMax, options.nticks));
         yticklabels(ax, {'0', '\pi', '2\cdot\pi'});
     end
 
@@ -46,7 +46,7 @@ function tgv_plotStreamFunction(ax, X, Y, Psi, titleText, xlabelText, ylabelText
         zlim(ax, zRange);
         zticks(ax, linspace(zRange(1), zRange(2), options.nticks));
     else
-        zlim(ax, [options.z_min options.z_max]);
-        zticks(ax, linspace(options.z_min, options.z_max, options.nticks));
+        zlim(ax, [options.zMin options.zMax]);
+        zticks(ax, linspace(options.zMin, options.zMax, options.nticks));
     end
 end

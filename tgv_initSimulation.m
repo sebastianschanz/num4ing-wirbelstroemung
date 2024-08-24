@@ -1,35 +1,21 @@
 function data = tgv_initSimulation(options)
     % Initialisierung der Simulationsvariablen für den Taylor-Green-Wirbel
-    x = linspace(options.x_min, options.x_max, options.nx);
-    y = linspace(options.y_min, options.y_max, options.ny);
+    x = linspace(options.xMin, options.xMax, options.nx);
+    y = linspace(options.yMin, options.yMax, options.ny);
     [X, Y] = meshgrid(x, y);
     data.X = X;   data.Y = Y;
 
-    % Zufällige Auswahl der Partikel für das Plotten der Bahnlinien
-    numParticles = options.numParticles;
-    totalParticles = numel(X);
-    data.particleIdx = randperm(totalParticles, numParticles);
-    
-    % Arrays zur Speicherung der Bahnlinien mehrerer Partikel
-    data.X_n_trail = cell(numParticles, 1);
-    data.Y_n_trail = cell(numParticles, 1);
-    data.X_a_trail = cell(numParticles, 1);
-    data.Y_a_trail = cell(numParticles, 1);
-
-    % Arrays zur Speicherung der Enstrophie und kinetischen Energy
-    data.enst_n = zeros(1, options.t_nr);
-    data.enst_a = zeros(1, options.t_nr);
-    data.energy_n = zeros(1, options.t_nr);
-    data.energy_a = zeros(1, options.t_nr);
+    % Preallokation der Zeit, Energie und Enstrophie-Arrays
+    data.time = zeros(1, options.maxIters);
+    data.energy_n = NaN(1, options.maxIters);
+    data.enst_n = NaN(1, options.maxIters);
+    data.energy_a = NaN(1, options.maxIters);
+    data.enst_a = NaN(1, options.maxIters);
 
     % Erstellen der Ableitungsmatrizen D1x, D1y, D2x und D2y
     [D1x, D1y] = tgv_createNabla(options);
     [D2x, D2y] = tgv_createLaplace(options);
     data.D1x = D1x;   data.D1y = D1y;   data.D2x = D2x;   data.D2y = D2y;
-
-    % Erstellt die Ableitungsmatrizen für das Aufwind-Verfahren
-    [D1xp, D1xm, D1yp, D1ym] = tgv_createNablaAufwind(options);
-    data.D1xp = D1xp;   data.D1xm = D1xm;   data.D1yp = D1yp;   data.D1ym = D1ym;
 
     % Definition des Boolschen Vektors für die Poisson-Gleichung
     B = false(options.nx, options.ny);
@@ -79,4 +65,9 @@ function data = tgv_initSimulation(options)
     fig = figure('Units', 'pixels', 'Position', [figPosX, figPosY, figWidth, figHeight]); % Figure erstellen
     set(fig, 'Resize', 'off');
     data.fig = fig;
+    if options.calcErrors
+        data.title = 'Taylor-Green-Wirbel';
+    else
+        data.title = 'TGW';
+    end
 end

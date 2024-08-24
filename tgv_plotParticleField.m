@@ -6,7 +6,7 @@ function tgv_plotParticleField(ax, X_pos, Y_pos, colors, titleText, xlabelText, 
     xlabel(ax, xlabelText, 'Interpreter', 'latex'); % X-Achsenbeschriftung
     ylabel(ax, ylabelText, 'Interpreter', 'latex'); % Y-Achsenbeschriftung
     axis(ax, 'square'); % Achsenverhältnis beibehalten andere Optionen sind
-    set(ax, 'Color', 'none'); % Hintergrund entfernen
+    %set(ax, 'Color', 'none'); % Hintergrund entfernen
     set(ax, 'FontSize', options.imgScale*options.fontSize);
     set(get(ax, 'Title'), 'FontSize', options.imgScale*(options.fontSize+2));
 
@@ -23,8 +23,8 @@ function tgv_plotParticleField(ax, X_pos, Y_pos, colors, titleText, xlabelText, 
         xticks(ax, linspace(xRange(1), xRange(2), options.nticks));
         xticklabels(ax, {xRange(1), xRange(2)});
     else
-        xlim(ax, [options.x_min options.x_max]);
-        xticks(ax, linspace(options.x_min, options.x_max, options.nticks));
+        xlim(ax, [options.xMin options.xMax]);
+        xticks(ax, linspace(options.xMin, options.xMax, options.nticks));
         xticklabels(ax, {'0', '\pi', '2\cdot\pi'});
     end
 
@@ -34,8 +34,8 @@ function tgv_plotParticleField(ax, X_pos, Y_pos, colors, titleText, xlabelText, 
         yticks(ax, linspace(yRange(1), yRange(2), options.nticks));
         yticklabels(ax, {yRange(1), yRange(2)});
     else
-        ylim(ax, [options.y_min options.y_max]);
-        yticks(ax, linspace(options.y_min, options.y_max, options.nticks));
+        ylim(ax, [options.yMin options.yMax]);
+        yticks(ax, linspace(options.yMin, options.yMax, options.nticks));
         yticklabels(ax, {'0', '\pi', '2\cdot\pi'});
     end
 end

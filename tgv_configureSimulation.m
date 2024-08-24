@@ -1,48 +1,46 @@
 function options = tgv_configureSimulation()
     % Funktion zur Konfiguration der Simulationsparameter
-    options.nu = 0.2; % Kinematische Viskosität
+    options.nu = 0.15; % Kinematische Viskosität
     options.rho = 1.0; % Dichte des Fluids
     options.mu = options.nu * options.rho; % Dynamische Viskosität
     options.nx = 50; % Anzahl der Gitterpunkte in x-Richtung
     options.ny = 50; % Anzahl der Gitterpunkte in y-Richtung
 
-    % Intervallgrenzen in x-, y- und z-Richtung
-    options.x_min = 0;
-    options.x_max = 2 * pi;
-    options.y_min = 0;
-    options.y_max = 2 * pi;
-    options.z_min = -1;
-    options.z_max = 1;
-    options.y2_min = -10;
-    options.y2_max = 10;
+    % Intervallgrenzen 
+    % Partikelplot, Bahnlinien und Stromfunktion
+    options.xMin = 0;
+    options.xMax = 2 * pi;
+    options.yMin = 0;
+    options.yMax = 2 * pi;
+    options.zMin = -1;
+    options.zMax = 1;
+    % Positionsfehler
+    options.posMin = 0;
+    options.posMax = 0.1;
+    % Energie und Enstrophieplot
+    options.ensMin = -10;
+    options.ensMax = 10;
     
     % Gitterabstände in x- und y-Richtung
-    options.dx = (options.x_max - options.x_min) / (options.nx - 1);
-    options.dy = (options.y_max - options.y_min) / (options.nx - 1);
+    options.dx = (options.xMax - options.xMin) / (options.nx - 1);
+    options.dy = (options.yMax - options.yMin) / (options.nx - 1);
 
     % Endzeit, Anzahl der Zeitschritte und Zeitschrittweite
-    options.t_end = 8;
-    options.t_nr = options.t_end*20+1;
-    options.dt = options.t_end / options.t_nr;
-    options.stepMethod = 'heun';             % Methode für Schrittverfahren
-    options.Aufwind = false;                % Aufwind Methode Anwenden oder nicht
-    options.maxIter = 100;                 % Maximale Anzahl von Iterationen für implizite Verfahren
-    options.tol = 1e-6;                     % Toleranz für die Iteration der impliziten Verfahren
-    % Schritt-Methoden: 'exEuler', 'imEuler', 'heun', 'rk4'
+    options.tEnd = 8;                      % Endzeit der Simulation
+    options.dt = 0.03;                      % Initiale Zeitschrittweite. Wird im Verlauf der Simulation überschrieben.
+    options.dynamicTimeSteps = true;        % Dynamische Zeitschrittweitensteuerung aktivieren
+    options.maxIters = 1000;                % Maximale Iterationsanzahl. Betrifft die Speichervorreservierung für die Ergebnisarrays
+    options.cfl = 0.3;                      % Zielwert CFL-Zahl für die Zeitschrittweitensteuerung
+    options.stepMethod = 'Heun';            % Methode für Schrittverfahren: 'Expliziter Euler', 'Heun', 'Runge-Kutta 4'
  
     options.calcErrors = true;              % Fehlerberechnung aktivieren
-    options.calcEnergy = true;              % Energieberechnung aktivieren
-    options.calcCFL = false;                % maximale CFL-Zahl berechnen
-    options.showTraj = false;               % Bahnlinie eines Partikels anzeigen
-    options.numParticles = 12;              % Startindex für die Partikel
-    
-    options.writeGif = true;               % GIF-Datei schreiben
-    options.colormap = 'parula';            % Farbkarte für die Darstellung
+    options.writeGif = false;               % GIF-Datei schreiben
+    options.colormap = 'parula';            % Farbschema für Plots
     options.nticks = 3;                     % Anzahl der Ticks auf Achsenen
     options.imgWidth = 400;                 % Bildbreite
     options.imgHeight = options.imgWidth;   % Bildhöhe
     options.fontSize = 8;                   % Grund-Schriftgröße
-    options.imgScale = 1.5;                   % 1-1.8, Skalierungsfaktor für Bildauflösung, hochschrauben für schönere Gifs
-    options.filename = sprintf('.\\export\\simulation_%s_nu_%.2f_tend_%d.gif', ...
-                                options.stepMethod, options.nu, options.t_end);
+    options.imgScale = 1.5;                 % 1-1.8, Skalierungsfaktor für Bildauflösung, hochschrauben für schönere Gifs
+    options.filename = sprintf('.\\export\\tgv_simulation_%s_nu%.2f_t%d_dts%d.gif', ...
+                                options.stepMethod, options.nu, options.tEnd, options.dynamicTimeSteps);
 end
