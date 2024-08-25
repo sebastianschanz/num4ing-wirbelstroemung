@@ -1,7 +1,7 @@
 function pos_err_std = tgv_plotErrors(ax, pos_err_abs, titleText, options)
     % Funktion zur Erstellung eines Boxplots der absoluten Positionsfehler
     color1 = [255, 210, 50]/255;
-    color2 = [220, 120, 0]/255; 
+    color2 = [240, 90, 0]/255;
     cla(ax); % Achse löschen
 
     pos_err_abs = pos_err_abs(:); % Fehlerwerte als Spaltenvektor
@@ -9,7 +9,7 @@ function pos_err_std = tgv_plotErrors(ax, pos_err_abs, titleText, options)
     pos_err_median = median(pos_err_abs); % Median der Fehlerwerte
     
     % Boxplot erstellen
-    boxchart(ax, pos_err_abs, 'Orientation', 'horizontal', 'BoxFaceColor', color1, 'MarkerColor', color2, 'MarkerSize', options.imgScale * 4); % Plot box plot in red color
+    boxchart(ax, pos_err_abs, 'Orientation', 'horizontal', 'BoxFaceColor', color2, 'MarkerColor', color2, 'MarkerSize', options.imgScale * 4); % Plot box plot in red color
     title(ax, titleText, 'Interpreter', 'latex'); % Titel setzen
     xlim(ax, [options.posMin, options.posMax]); % X-Achsenbereich setzen
     xticks(ax, linspace(options.posMin, options.posMax, options.nticks));
@@ -25,8 +25,8 @@ function pos_err_std = tgv_plotErrors(ax, pos_err_abs, titleText, options)
 
     % Medianwert als Text einfügen
     hold(ax, 'on');
-    text(ax, pos_err_median, 1.3 + max(pos_err_abs)/50, sprintf('$Med$ %.4f', pos_err_median), ...
+    text(ax, pos_err_median, 1.3 + max(pos_err_abs)/50, sprintf('$Med$ %.3f', pos_err_median), ...
         'VerticalAlignment', 'bottom', 'HorizontalAlignment', 'center', ...
-        'Interpreter', 'latex', 'FontSize', options.imgScale * options.fontSize);
+        'Interpreter', 'latex', 'FontSize', options.imgScale * options.fontSize-1);
     hold(ax, 'off');
 end

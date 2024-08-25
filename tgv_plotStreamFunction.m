@@ -46,7 +46,25 @@ function tgv_plotStreamFunction(ax, X, Y, Psi, titleText, xlabelText, ylabelText
         zlim(ax, zRange);
         zticks(ax, linspace(zRange(1), zRange(2), options.nticks));
     else
-        zlim(ax, [options.zMin options.zMax]);
+        zlim(ax, [options.zMin options.zMax+0.01]);
         zticks(ax, linspace(options.zMin, options.zMax, options.nticks));
+    end
+
+    if options.showPsiMax
+        % 3D-Maximalwert finden und markieren
+        [maxValue, maxIndex] = max(Psi(:)); % Maximalwert und Index finden
+        [maxRow, maxCol] = ind2sub(size(Psi), maxIndex); % Max-Position finden
+        maxX = X(maxRow, maxCol);
+        maxY = Y(maxRow, maxCol);
+
+        % Markiere den Maximalwert mit einem kleinen Kreuz
+        hold(ax, 'on');
+        plot3(ax, maxX, maxY, maxValue+0.005, 'kx', 'MarkerSize', options.imgScale * 3, 'LineWidth', options.imgScale * 0.7);
+
+        % Annotiere den Maximalwert
+        text(ax, maxX, maxY, maxValue+0.015, sprintf('$Max$ %.3f', maxValue), ...
+            'VerticalAlignment', 'bottom', 'HorizontalAlignment', 'center', 'Interpreter', 'latex', 'FontSize', options.imgScale * options.fontSize-1);
+
+        hold(ax, 'off');
     end
 end

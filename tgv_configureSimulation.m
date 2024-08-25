@@ -34,6 +34,7 @@ function options = tgv_configureSimulation()
     options.stepMethod = 'Heun';            % Methode für Schrittverfahren: 'Expliziter Euler', 'Heun', 'Runge-Kutta 4'
  
     options.calcErrors = true;              % Fehlerberechnung aktivieren
+    options.showPsiMax = true;                % Maximalwert der Stromfunktion anzeigen
     options.writeGif = false;               % GIF-Datei schreiben
     options.colormap = 'parula';            % Farbschema für Plots
     options.nticks = 3;                     % Anzahl der Ticks auf Achsenen
